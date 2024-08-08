@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "[haskell]": {
+    "editor.defaultFormatter": "haskell.haskell"
+  },
+  "[cabal]": {
+    "editor.defaultFormatter": "berberman.vscode-cabal-fmt"
+  }
+}
