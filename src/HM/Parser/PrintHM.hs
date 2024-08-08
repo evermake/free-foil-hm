@@ -137,6 +137,10 @@ instance Print Integer where
 instance Print Double where
   prt _ x = doc (shows x)
 
+instance Print HM.Parser.AbsHM.TypedExp where
+  prt i = \case
+    HM.Parser.AbsHM.TypedExp exp type_ -> prPrec i 0 (concatD [prt 0 exp, doc (showString "::"), prt 0 type_])
+
 instance Print HM.Parser.AbsHM.Exp where
   prt i = \case
     HM.Parser.AbsHM.ETrue -> prPrec i 2 (concatD [doc (showString "true")])
@@ -146,3 +150,8 @@ instance Print HM.Parser.AbsHM.Exp where
     HM.Parser.AbsHM.ESub exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, doc (showString "-"), prt 2 exp2])
     HM.Parser.AbsHM.EIf exp1 exp2 exp3 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 exp1, doc (showString "then"), prt 0 exp2, doc (showString "else"), prt 0 exp3])
     HM.Parser.AbsHM.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
+
+instance Print HM.Parser.AbsHM.Type where
+  prt i = \case
+    HM.Parser.AbsHM.TNat -> prPrec i 0 (concatD [doc (showString "Nat")])
+    HM.Parser.AbsHM.TBool -> prPrec i 0 (concatD [doc (showString "Bool")])

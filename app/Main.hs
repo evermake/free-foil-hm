@@ -1,9 +1,7 @@
 module Main where
 
-import HM.Interpreter.Interpret
-import HM.Parser.AbsHM
-import HM.Parser.LexHM
-import HM.Parser.ParHM
+import           HM.Interpreter.Typecheck
+import           HM.Parser.ParHM
 
 main :: IO ()
 main = do
@@ -13,6 +11,6 @@ main = do
 calc :: String -> String
 calc input = do
   let tokens = myLexer input
-  case pExp tokens of
-    Left err -> "ERROR: " ++ err
-    Right exp -> interpret exp
+  case pTypedExp tokens of
+    Left err       -> "ERROR: " ++ err
+    Right typedExp -> typecheck typedExp

@@ -8,9 +8,11 @@
 module HM.Parser.ParHM
   ( happyError
   , myLexer
+  , pTypedExp
   , pExp2
   , pExp1
   , pExp
+  , pType
   ) where
 
 import Prelude
@@ -20,9 +22,11 @@ import HM.Parser.LexHM
 
 }
 
+%name pTypedExp TypedExp
 %name pExp2 Exp2
 %name pExp1 Exp1
 %name pExp Exp
+%name pType Type
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
@@ -31,18 +35,24 @@ import HM.Parser.LexHM
   ')'      { PT _ (TS _ 2)  }
   '+'      { PT _ (TS _ 3)  }
   '-'      { PT _ (TS _ 4)  }
-  'else'   { PT _ (TS _ 5)  }
-  'false'  { PT _ (TS _ 6)  }
-  'if'     { PT _ (TS _ 7)  }
-  'iszero' { PT _ (TS _ 8)  }
-  'then'   { PT _ (TS _ 9)  }
-  'true'   { PT _ (TS _ 10) }
+  '::'     { PT _ (TS _ 5)  }
+  'Bool'   { PT _ (TS _ 6)  }
+  'Nat'    { PT _ (TS _ 7)  }
+  'else'   { PT _ (TS _ 8)  }
+  'false'  { PT _ (TS _ 9)  }
+  'if'     { PT _ (TS _ 10) }
+  'iszero' { PT _ (TS _ 11) }
+  'then'   { PT _ (TS _ 12) }
+  'true'   { PT _ (TS _ 13) }
   L_integ  { PT _ (TI $$)   }
 
 %%
 
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
+
+TypedExp :: { HM.Parser.AbsHM.TypedExp }
+TypedExp : Exp '::' Type { HM.Parser.AbsHM.TypedExp $1 $3 }
 
 Exp2 :: { HM.Parser.AbsHM.Exp }
 Exp2
@@ -62,6 +72,10 @@ Exp :: { HM.Parser.AbsHM.Exp }
 Exp
   : 'if' Exp 'then' Exp 'else' Exp { HM.Parser.AbsHM.EIf $2 $4 $6 }
   | Exp1 { $1 }
+
+Type :: { HM.Parser.AbsHM.Type }
+Type
+  : 'Nat' { HM.Parser.AbsHM.TNat } | 'Bool' { HM.Parser.AbsHM.TBool }
 
 {
 

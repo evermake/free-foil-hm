@@ -20,11 +20,12 @@ Integer literals //Integer// are nonempty sequences of digits.
 The set of reserved words is the set of terminals appearing in the grammar. Those reserved words that consist of non-letter characters are called symbols, and they are treated in a different way from those that are similar to identifiers. The lexer follows rules familiar from languages like Haskell, C, and Java, including longest match and spacing conventions.
 
 The reserved words used in HM are the following:
-  | ``else`` | ``false`` | ``if`` | ``iszero``
-  | ``then`` | ``true`` |  |
+  | ``Bool`` | ``Nat`` | ``else`` | ``false``
+  | ``if`` | ``iszero`` | ``then`` | ``true``
 
 The symbols used in HM are the following:
-  | + | - | ( | )
+  | :: | + | - | (
+  | ) |  |  |
 
 ===Comments===
 There are no single-line comments in the grammar.There are no multiple-line comments in the grammar.
@@ -35,6 +36,7 @@ The symbols -> (production),  **|**  (union)
 and **eps** (empty rule) belong to the BNF notation.
 All other symbols are terminals.
 
+  | //TypedExp// | -> | //Exp// ``::`` //Type//
   | //Exp2// | -> | ``true``
   |  |  **|**  | ``false``
   |  |  **|**  | //Integer//
@@ -45,6 +47,8 @@ All other symbols are terminals.
   |  |  **|**  | //Exp2//
   | //Exp// | -> | ``if`` //Exp// ``then`` //Exp// ``else`` //Exp//
   |  |  **|**  | //Exp1//
+  | //Type// | -> | ``Nat``
+  |  |  **|**  | ``Bool``
 
 
 

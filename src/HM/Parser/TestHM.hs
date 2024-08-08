@@ -20,7 +20,7 @@ import Control.Monad      ( when )
 
 import HM.Parser.AbsHM   ()
 import HM.Parser.LexHM   ( Token, mkPosToken )
-import HM.Parser.ParHM   ( pExp2, myLexer )
+import HM.Parser.ParHM   ( pTypedExp, myLexer )
 import HM.Parser.PrintHM ( Print, printTree )
 import HM.Parser.SkelHM  ()
 
@@ -70,7 +70,7 @@ main = do
   args <- getArgs
   case args of
     ["--help"] -> usage
-    []         -> getContents >>= run 2 pExp2
-    "-s":fs    -> mapM_ (runFile 0 pExp2) fs
-    fs         -> mapM_ (runFile 2 pExp2) fs
+    []         -> getContents >>= run 2 pTypedExp
+    "-s":fs    -> mapM_ (runFile 0 pTypedExp) fs
+    fs         -> mapM_ (runFile 2 pTypedExp) fs
 

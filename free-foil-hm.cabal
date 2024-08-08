@@ -31,6 +31,7 @@ custom-setup
 library
   exposed-modules:
       HM.Interpreter.Interpret
+      HM.Interpreter.Typecheck
       HM.Parser.AbsHM
       HM.Parser.LexHM
       HM.Parser.ParHM
