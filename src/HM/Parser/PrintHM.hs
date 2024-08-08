@@ -137,6 +137,11 @@ instance Print Integer where
 instance Print Double where
   prt _ x = doc (shows x)
 
+instance Print HM.Parser.AbsHM.Command where
+  prt i = \case
+    HM.Parser.AbsHM.CommandCheck typedexp -> prPrec i 0 (concatD [doc (showString "check"), prt 0 typedexp])
+    HM.Parser.AbsHM.CommandEval exp -> prPrec i 0 (concatD [doc (showString "eval"), prt 0 exp])
+
 instance Print HM.Parser.AbsHM.TypedExp where
   prt i = \case
     HM.Parser.AbsHM.TypedExp exp type_ -> prPrec i 0 (concatD [prt 0 exp, doc (showString "::"), prt 0 type_])

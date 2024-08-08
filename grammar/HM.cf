@@ -1,3 +1,6 @@
+CommandCheck. Command ::= "check" TypedExp ;
+CommandEval.  Command ::= "eval" Exp ;
+
 TypedExp. TypedExp ::= Exp "::" Type ;
 
 ETrue.    Exp2 ::= "true" ;

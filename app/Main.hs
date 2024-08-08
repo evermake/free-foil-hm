@@ -1,16 +1,20 @@
 module Main where
 
+import           HM.Interpreter.Interpret
 import           HM.Interpreter.Typecheck
+import           HM.Parser.AbsHM
 import           HM.Parser.ParHM
 
 main :: IO ()
-main = do
-  interact calc
-  putStrLn ""
+main = interact (unlines . map calc . lines)
 
 calc :: String -> String
-calc input = do
-  let tokens = myLexer input
-  case pTypedExp tokens of
+calc input = "-- " ++
+  case pCommand tokens of
     Left err       -> "ERROR: " ++ err
-    Right typedExp -> typecheck typedExp
+    Right cmd ->
+      case cmd of
+        CommandCheck typedExp -> typecheck typedExp
+        CommandEval exp -> interpret exp
+  where
+    tokens = myLexer input

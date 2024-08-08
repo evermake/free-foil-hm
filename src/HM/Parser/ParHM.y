@@ -8,6 +8,7 @@
 module HM.Parser.ParHM
   ( happyError
   , myLexer
+  , pCommand
   , pTypedExp
   , pExp2
   , pExp1
@@ -22,6 +23,7 @@ import HM.Parser.LexHM
 
 }
 
+%name pCommand Command
 %name pTypedExp TypedExp
 %name pExp2 Exp2
 %name pExp1 Exp1
@@ -38,18 +40,25 @@ import HM.Parser.LexHM
   '::'     { PT _ (TS _ 5)  }
   'Bool'   { PT _ (TS _ 6)  }
   'Nat'    { PT _ (TS _ 7)  }
-  'else'   { PT _ (TS _ 8)  }
-  'false'  { PT _ (TS _ 9)  }
-  'if'     { PT _ (TS _ 10) }
-  'iszero' { PT _ (TS _ 11) }
-  'then'   { PT _ (TS _ 12) }
-  'true'   { PT _ (TS _ 13) }
+  'check'  { PT _ (TS _ 8)  }
+  'else'   { PT _ (TS _ 9)  }
+  'eval'   { PT _ (TS _ 10) }
+  'false'  { PT _ (TS _ 11) }
+  'if'     { PT _ (TS _ 12) }
+  'iszero' { PT _ (TS _ 13) }
+  'then'   { PT _ (TS _ 14) }
+  'true'   { PT _ (TS _ 15) }
   L_integ  { PT _ (TI $$)   }
 
 %%
 
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
+
+Command :: { HM.Parser.AbsHM.Command }
+Command
+  : 'check' TypedExp { HM.Parser.AbsHM.CommandCheck $2 }
+  | 'eval' Exp { HM.Parser.AbsHM.CommandEval $2 }
 
 TypedExp :: { HM.Parser.AbsHM.TypedExp }
 TypedExp : Exp '::' Type { HM.Parser.AbsHM.TypedExp $1 $3 }

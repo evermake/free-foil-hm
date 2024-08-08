@@ -15,6 +15,11 @@ type Result = Err String
 failure :: Show a => a -> Result
 failure x = Left $ "Undefined case: " ++ show x
 
+transCommand :: HM.Parser.AbsHM.Command -> Result
+transCommand x = case x of
+  HM.Parser.AbsHM.CommandCheck typedexp -> failure x
+  HM.Parser.AbsHM.CommandEval exp -> failure x
+
 transTypedExp :: HM.Parser.AbsHM.TypedExp -> Result
 transTypedExp x = case x of
   HM.Parser.AbsHM.TypedExp exp type_ -> failure x
