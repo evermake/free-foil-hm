@@ -1,7 +1,8 @@
-_. Exp ::= Exp1 ;
-_. Exp ::= Exp2 ;
-
-ETrue.  Exp2 ::= "true" ;
-EFalse. Exp2 ::= "false" ;
-ENat.   Exp2 ::= Integer ;
-EAdd.   Exp1 ::= Exp "+" Exp ;
+ETrue.    Exp2 ::= "true" ;
+EFalse.   Exp2 ::= "false" ;
+ENat.     Exp2 ::= Integer ;
+EAdd.     Exp1 ::= Exp1 "+" Exp2 ;
+ESub.     Exp1 ::= Exp1 "-" Exp2 ;
+EIf.      Exp  ::= "if" Exp "then" Exp "else" Exp ;
+EIsZero.  Exp2 ::= "iszero" "(" Exp ")" ;
+coercions Exp 2 ;

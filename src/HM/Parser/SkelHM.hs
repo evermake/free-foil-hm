@@ -21,3 +21,6 @@ transExp x = case x of
   HM.Parser.AbsHM.EFalse -> failure x
   HM.Parser.AbsHM.ENat integer -> failure x
   HM.Parser.AbsHM.EAdd exp1 exp2 -> failure x
+  HM.Parser.AbsHM.ESub exp1 exp2 -> failure x
+  HM.Parser.AbsHM.EIf exp1 exp2 exp3 -> failure x
+  HM.Parser.AbsHM.EIsZero exp -> failure x

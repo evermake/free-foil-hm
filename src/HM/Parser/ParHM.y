@@ -8,9 +8,9 @@
 module HM.Parser.ParHM
   ( happyError
   , myLexer
-  , pExp
   , pExp2
   , pExp1
+  , pExp
   ) where
 
 import Prelude
@@ -20,34 +20,48 @@ import HM.Parser.LexHM
 
 }
 
-%name pExp Exp
 %name pExp2 Exp2
 %name pExp1 Exp1
+%name pExp Exp
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
 %token
-  '+'      { PT _ (TS _ 1) }
-  'false'  { PT _ (TS _ 2) }
-  'true'   { PT _ (TS _ 3) }
-  L_integ  { PT _ (TI $$)  }
+  '('      { PT _ (TS _ 1)  }
+  ')'      { PT _ (TS _ 2)  }
+  '+'      { PT _ (TS _ 3)  }
+  '-'      { PT _ (TS _ 4)  }
+  'else'   { PT _ (TS _ 5)  }
+  'false'  { PT _ (TS _ 6)  }
+  'if'     { PT _ (TS _ 7)  }
+  'iszero' { PT _ (TS _ 8)  }
+  'then'   { PT _ (TS _ 9)  }
+  'true'   { PT _ (TS _ 10) }
+  L_integ  { PT _ (TI $$)   }
 
 %%
 
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
 
-Exp :: { HM.Parser.AbsHM.Exp }
-Exp : Exp1 { $1 } | Exp2 { $1 }
-
 Exp2 :: { HM.Parser.AbsHM.Exp }
 Exp2
   : 'true' { HM.Parser.AbsHM.ETrue }
   | 'false' { HM.Parser.AbsHM.EFalse }
   | Integer { HM.Parser.AbsHM.ENat $1 }
+  | 'iszero' '(' Exp ')' { HM.Parser.AbsHM.EIsZero $3 }
+  | '(' Exp ')' { $2 }
 
 Exp1 :: { HM.Parser.AbsHM.Exp }
-Exp1 : Exp '+' Exp { HM.Parser.AbsHM.EAdd $1 $3 }
+Exp1
+  : Exp1 '+' Exp2 { HM.Parser.AbsHM.EAdd $1 $3 }
+  | Exp1 '-' Exp2 { HM.Parser.AbsHM.ESub $1 $3 }
+  | Exp2 { $1 }
+
+Exp :: { HM.Parser.AbsHM.Exp }
+Exp
+  : 'if' Exp 'then' Exp 'else' Exp { HM.Parser.AbsHM.EIf $2 $4 $6 }
+  | Exp1 { $1 }
 
 {
 
