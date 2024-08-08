@@ -15,16 +15,22 @@ Optional:
 
 ### Commands
 
-Build interpreter:
+Build interpreter (and generate parser from `grammar/HM.cf`):
 
 ```sh
-just build
+stack build
 ```
 
-Generate parser from `grammar/HM.cf`:
+From time to time, if you change sometime in the grammar, you might need to clean:
 
 ```sh
-just generate-parser
+stack clean && stack build
+```
+
+To run the interpreter:
+
+```sh
+stack run
 ```
 
 ## Plan
