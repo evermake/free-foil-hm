@@ -1,6 +1,6 @@
-module HM.Interpreter.Interpret where
+module HM.Eval where
 
-import HM.Parser.AbsHM
+import HM.Parser.Abs
 
 interpret :: Exp -> String
 interpret ETrue = "true"

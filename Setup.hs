@@ -35,10 +35,12 @@ main =
                 [ "set -ex" ] <>
                 [ "chcp.com" | isWindows ] <>
                 [ "chcp.com 65001" | isWindows ] <>
-                [ "bnfc --haskell -p HM.Parser --generic -o src/ grammar/HM.cf"
+                [ "cp grammar/hindley-milner.cf grammar/Parser.cf"  -- Workaround to customize generated package name
+                , "bnfc --haskell -d -p HM --generic -o src grammar/Parser.cf"
+                , "rm grammar/Parser.cf"
                 , "cd src/HM/Parser"
-                , "alex LexHM.x"
-                , "happy ParHM.y"
+                , "alex Lex.x"
+                , "happy Par.y"
                 , "true"
                 ]
 

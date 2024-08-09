@@ -5,7 +5,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns -fno-warn-overlapping-patterns #-}
 {-# LANGUAGE PatternSynonyms #-}
 
-module HM.Parser.ParHM
+module HM.Parser.Par
   ( happyError
   , myLexer
   , pCommand
@@ -18,8 +18,8 @@ module HM.Parser.ParHM
 
 import Prelude
 
-import qualified HM.Parser.AbsHM
-import HM.Parser.LexHM
+import qualified HM.Parser.Abs
+import HM.Parser.Lex
 
 }
 
@@ -55,36 +55,36 @@ import HM.Parser.LexHM
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
 
-Command :: { HM.Parser.AbsHM.Command }
+Command :: { HM.Parser.Abs.Command }
 Command
-  : 'check' TypedExp { HM.Parser.AbsHM.CommandCheck $2 }
-  | 'eval' Exp { HM.Parser.AbsHM.CommandEval $2 }
+  : 'check' TypedExp { HM.Parser.Abs.CommandCheck $2 }
+  | 'eval' Exp { HM.Parser.Abs.CommandEval $2 }
 
-TypedExp :: { HM.Parser.AbsHM.TypedExp }
-TypedExp : Exp '::' Type { HM.Parser.AbsHM.TypedExp $1 $3 }
+TypedExp :: { HM.Parser.Abs.TypedExp }
+TypedExp : Exp '::' Type { HM.Parser.Abs.TypedExp $1 $3 }
 
-Exp2 :: { HM.Parser.AbsHM.Exp }
+Exp2 :: { HM.Parser.Abs.Exp }
 Exp2
-  : 'true' { HM.Parser.AbsHM.ETrue }
-  | 'false' { HM.Parser.AbsHM.EFalse }
-  | Integer { HM.Parser.AbsHM.ENat $1 }
-  | 'iszero' '(' Exp ')' { HM.Parser.AbsHM.EIsZero $3 }
+  : 'true' { HM.Parser.Abs.ETrue }
+  | 'false' { HM.Parser.Abs.EFalse }
+  | Integer { HM.Parser.Abs.ENat $1 }
+  | 'iszero' '(' Exp ')' { HM.Parser.Abs.EIsZero $3 }
   | '(' Exp ')' { $2 }
 
-Exp1 :: { HM.Parser.AbsHM.Exp }
+Exp1 :: { HM.Parser.Abs.Exp }
 Exp1
-  : Exp1 '+' Exp2 { HM.Parser.AbsHM.EAdd $1 $3 }
-  | Exp1 '-' Exp2 { HM.Parser.AbsHM.ESub $1 $3 }
+  : Exp1 '+' Exp2 { HM.Parser.Abs.EAdd $1 $3 }
+  | Exp1 '-' Exp2 { HM.Parser.Abs.ESub $1 $3 }
   | Exp2 { $1 }
 
-Exp :: { HM.Parser.AbsHM.Exp }
+Exp :: { HM.Parser.Abs.Exp }
 Exp
-  : 'if' Exp 'then' Exp 'else' Exp { HM.Parser.AbsHM.EIf $2 $4 $6 }
+  : 'if' Exp 'then' Exp 'else' Exp { HM.Parser.Abs.EIf $2 $4 $6 }
   | Exp1 { $1 }
 
-Type :: { HM.Parser.AbsHM.Type }
+Type :: { HM.Parser.Abs.Type }
 Type
-  : 'Nat' { HM.Parser.AbsHM.TNat } | 'Bool' { HM.Parser.AbsHM.TBool }
+  : 'Nat' { HM.Parser.Abs.TNat } | 'Bool' { HM.Parser.Abs.TBool }
 
 {
 

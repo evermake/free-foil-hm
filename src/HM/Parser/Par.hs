@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns -fno-warn-overlapping-patterns #-}
 {-# LANGUAGE PatternSynonyms #-}
 
-module HM.Parser.ParHM
+module HM.Parser.Par
   ( happyError
   , myLexer
   , pCommand
@@ -15,8 +15,8 @@ module HM.Parser.ParHM
 
 import Prelude
 
-import qualified HM.Parser.AbsHM
-import HM.Parser.LexHM
+import qualified HM.Parser.Abs
+import HM.Parser.Lex
 import qualified Data.Array as Happy_Data_Array
 import qualified Data.Bits as Bits
 import Control.Applicative(Applicative(..))
@@ -28,10 +28,10 @@ data HappyAbsSyn
 	= HappyTerminal (Token)
 	| HappyErrorToken Prelude.Int
 	| HappyAbsSyn9 (Integer)
-	| HappyAbsSyn10 (HM.Parser.AbsHM.Command)
-	| HappyAbsSyn11 (HM.Parser.AbsHM.TypedExp)
-	| HappyAbsSyn12 (HM.Parser.AbsHM.Exp)
-	| HappyAbsSyn15 (HM.Parser.AbsHM.Type)
+	| HappyAbsSyn10 (HM.Parser.Abs.Command)
+	| HappyAbsSyn11 (HM.Parser.Abs.TypedExp)
+	| HappyAbsSyn12 (HM.Parser.Abs.Exp)
+	| HappyAbsSyn15 (HM.Parser.Abs.Type)
 
 {- to allow type-synonyms as our monads (likely
  - with explicitly-specified bind and return)
@@ -388,7 +388,7 @@ happyReduce_7 = happySpecReduce_2  10 happyReduction_7
 happyReduction_7 (HappyAbsSyn11  happy_var_2)
 	_
 	 =  HappyAbsSyn10
-		 (HM.Parser.AbsHM.CommandCheck happy_var_2
+		 (HM.Parser.Abs.CommandCheck happy_var_2
 	)
 happyReduction_7 _ _  = notHappyAtAll 
 
@@ -396,7 +396,7 @@ happyReduce_8 = happySpecReduce_2  10 happyReduction_8
 happyReduction_8 (HappyAbsSyn12  happy_var_2)
 	_
 	 =  HappyAbsSyn10
-		 (HM.Parser.AbsHM.CommandEval happy_var_2
+		 (HM.Parser.Abs.CommandEval happy_var_2
 	)
 happyReduction_8 _ _  = notHappyAtAll 
 
@@ -405,26 +405,26 @@ happyReduction_9 (HappyAbsSyn15  happy_var_3)
 	_
 	(HappyAbsSyn12  happy_var_1)
 	 =  HappyAbsSyn11
-		 (HM.Parser.AbsHM.TypedExp happy_var_1 happy_var_3
+		 (HM.Parser.Abs.TypedExp happy_var_1 happy_var_3
 	)
 happyReduction_9 _ _ _  = notHappyAtAll 
 
 happyReduce_10 = happySpecReduce_1  12 happyReduction_10
 happyReduction_10 _
 	 =  HappyAbsSyn12
-		 (HM.Parser.AbsHM.ETrue
+		 (HM.Parser.Abs.ETrue
 	)
 
 happyReduce_11 = happySpecReduce_1  12 happyReduction_11
 happyReduction_11 _
 	 =  HappyAbsSyn12
-		 (HM.Parser.AbsHM.EFalse
+		 (HM.Parser.Abs.EFalse
 	)
 
 happyReduce_12 = happySpecReduce_1  12 happyReduction_12
 happyReduction_12 (HappyAbsSyn9  happy_var_1)
 	 =  HappyAbsSyn12
-		 (HM.Parser.AbsHM.ENat happy_var_1
+		 (HM.Parser.Abs.ENat happy_var_1
 	)
 happyReduction_12 _  = notHappyAtAll 
 
@@ -435,7 +435,7 @@ happyReduction_13 (_ `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn12
-		 (HM.Parser.AbsHM.EIsZero happy_var_3
+		 (HM.Parser.Abs.EIsZero happy_var_3
 	) `HappyStk` happyRest
 
 happyReduce_14 = happySpecReduce_3  12 happyReduction_14
@@ -452,7 +452,7 @@ happyReduction_15 (HappyAbsSyn12  happy_var_3)
 	_
 	(HappyAbsSyn12  happy_var_1)
 	 =  HappyAbsSyn12
-		 (HM.Parser.AbsHM.EAdd happy_var_1 happy_var_3
+		 (HM.Parser.Abs.EAdd happy_var_1 happy_var_3
 	)
 happyReduction_15 _ _ _  = notHappyAtAll 
 
@@ -461,7 +461,7 @@ happyReduction_16 (HappyAbsSyn12  happy_var_3)
 	_
 	(HappyAbsSyn12  happy_var_1)
 	 =  HappyAbsSyn12
-		 (HM.Parser.AbsHM.ESub happy_var_1 happy_var_3
+		 (HM.Parser.Abs.ESub happy_var_1 happy_var_3
 	)
 happyReduction_16 _ _ _  = notHappyAtAll 
 
@@ -481,7 +481,7 @@ happyReduction_18 ((HappyAbsSyn12  happy_var_6) `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn12
-		 (HM.Parser.AbsHM.EIf happy_var_2 happy_var_4 happy_var_6
+		 (HM.Parser.Abs.EIf happy_var_2 happy_var_4 happy_var_6
 	) `HappyStk` happyRest
 
 happyReduce_19 = happySpecReduce_1  14 happyReduction_19
@@ -494,13 +494,13 @@ happyReduction_19 _  = notHappyAtAll
 happyReduce_20 = happySpecReduce_1  15 happyReduction_20
 happyReduction_20 _
 	 =  HappyAbsSyn15
-		 (HM.Parser.AbsHM.TNat
+		 (HM.Parser.Abs.TNat
 	)
 
 happyReduce_21 = happySpecReduce_1  15 happyReduction_21
 happyReduction_21 _
 	 =  HappyAbsSyn15
-		 (HM.Parser.AbsHM.TBool
+		 (HM.Parser.Abs.TBool
 	)
 
 happyNewToken action sts stk [] =

@@ -1,13 +1,12 @@
 name: free-foil-hm
 version: 0.0.1
 github: "evermake/free-foil-hm"
-license: BSD3
 
 extra-source-files:
   - README.md
-  - grammar/HM.cf
+  - grammar/hindley-milner.cf
 
-synopsis: Hindley Milner type system implementation powered by Free Foil.
+synopsis: Hindley-Milner type system implementation powered by Free Foil.
 category: Language
 
 # To avoid duplicated efforts in documentation and dealing with the
@@ -18,14 +17,14 @@ description: Please see the README on GitHub at <https://github.com/evermake/fre
 custom-setup:
   dependencies:
     base: ">= 4.11.0.0 && < 5.0"
-    Cabal: ">= 2.4.0.1 && < 4.0"
     process: ">= 1.6.3.0"
+    Cabal: ">= 2.4.0.1 && < 4.0"
     PyF:
 
 build-tools:
+  BNFC:bnfc: ">= 2.9.4.1"
   alex: ">= 3.2.4"
   happy: ">= 1.19.9"
-  BNFC:bnfc: ">= 2.9.4.1"
 
 dependencies:
   base: ">= 4.7 && < 5"
@@ -34,28 +33,19 @@ dependencies:
 
 ghc-options:
   - -Wall
-  - -Wcompat
-  - -Widentities
-  - -Wincomplete-record-updates
-  - -Wincomplete-uni-patterns
-  - -Wmissing-export-lists
-  - -Wmissing-home-modules
-  - -Wpartial-fields
-  - -Wredundant-constraints
-  - -optP-Wno-nonportable-include-path
 
 library:
   source-dirs: src
   when:
     - condition: false
       other-modules:
-        - HM.Parser.TestHM
+        - HM.Parser.Test
         - HM.Parser.ErrM
-        - HM.Parser.SkelHM
+        - HM.Parser.Skel
 
 executables:
-  free-foil-hm:
-    main: Main.hs
+  repl:
+    main: Repl.hs
     source-dirs: app
     ghc-options:
       - -threaded

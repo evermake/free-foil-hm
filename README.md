@@ -1,55 +1,58 @@
-## Getting Started
+# [Hindley-Milner](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system) with [Free Foil](https://github.com/fizruk/free-foil)
 
-### Requirements
+> 🚧 WIP 🚧
 
-- Install GHCup
-- Install [just](https://github.com/casey/just)
-- Update cabal index: `cabal update`
-- Install bnfc (`cabal install BNFC`)
-- Install alex (`cabal install alex`)
-- Generate parser: `just generate-parser`
+## Development
 
-Optional:
-
-- Install cabal-fmt (`cabal install cabal-fmt`)
-
-### Commands
-
-Build interpreter (and generate parser from `grammar/HM.cf`):
+Make sure [Stack](https://docs.haskellstack.org/en/stable) is installed, then you can:
 
 ```sh
+# Build project
 stack build
 ```
 
-From time to time, if you change sometime in the grammar, you might need to clean:
+## Roadmap (preliminary)
 
-```sh
-stack clean && stack build
-```
+### 0. Preparation
 
-To run the interpreter:
+- [x] Setup repository with Stack
+- [x] Configure BNF Converter
 
-```sh
-stack run
-```
+### 1. Simply-typed expressions
 
-## Plan
+- [ ] Simple expressions grammar and parsing
+  - [ ] Natural number literals
+  - [ ] Boolean literals
+  - [ ] Addition (`+`)
+  - [ ] iszero
+  - [ ] if-then-else
+- [ ] Evaluation
+- [ ] Typechecking (e.g. `(1 + true)` should trigger a type error)
+- [ ] REPL
 
-0. Implement simply-typed expressions
-   - Natural numbers (literals, addition, iszero) + Booleans (literals, if-then-else)
-   - Types: Nat, Bool
-   - Use BNF Converter (you can see lambda-pi package in free-foil repository)
-   - REPL
-   - typecheck ((1 + true) should trigger a type error)
-1. Add let-bindings with variables to simply-typed expressions
-   - use free foil + TH (for bound variables)
-   - maybe add for-loop
-2. STLC (simply typed lambda calculus)
-   - function types
-   - lambda abstraction with explicit type of the argument (λx:T. t)
-   - function application (local inference)
-3. System F (only typechecking, local inference)
-4. Hindley-Milner type inference
-   - Implement/reuse unification of types
-   - Implement Algorithm W
-5. Work towards extensions (Remy algorithm, arbitrary-rank polymorphism, HM(X), OutsideIn(X))
+### 2. Let-bindings with variables
+
+- [ ] Add Free Foil and TH for bound variables
+- [ ] Implement for-loop
+
+### 3. Simply Typed Lambda Calculus (STLC)
+
+- [ ] Function types
+- [ ] Abstraction (with explicit type of the argument: `λx:T. t`)
+- [ ] Application (local inference)
+
+### 4. System F
+
+- [ ] Typechecking with local inference
+
+### 5. Hindley-Milner
+
+- [ ] Type unification
+- [ ] Algorithm W
+
+### 6. Extensions
+
+- [ ] Remy algorithm
+- [ ] Arbitrary-rank polymorphism
+- [ ] HM(X)
+- [ ] OutsideIn(X)

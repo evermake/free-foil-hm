@@ -7,7 +7,7 @@
 
 {-# LANGUAGE PatternSynonyms #-}
 
-module HM.Parser.LexHM where
+module HM.Parser.Lex where
 
 import Prelude
 

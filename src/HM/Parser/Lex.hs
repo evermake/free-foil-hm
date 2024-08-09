@@ -3,13 +3,13 @@
 {-# OPTIONS_GHC -fno-warn-unused-binds #-}
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 {-# LANGUAGE CPP #-}
-{-# LINE 4 "LexHM.x" #-}
+{-# LINE 4 "Lex.x" #-}
 {-# OPTIONS -fno-warn-incomplete-patterns #-}
 {-# OPTIONS_GHC -w #-}
 
 {-# LANGUAGE PatternSynonyms #-}
 
-module HM.Parser.LexHM where
+module HM.Parser.Lex where
 
 import Prelude
 
@@ -1095,7 +1095,7 @@ alexRightContext IBOX(sc) user__ _ _ input__ =
         -- match when checking the right context, just
         -- the first match will do.
 #endif
-{-# LINE 50 "LexHM.x" #-}
+{-# LINE 50 "Lex.x" #-}
 -- | Create a token with position.
 tok :: (String -> Tok) -> (Posn -> String -> Token)
 tok f p = PT p . f
