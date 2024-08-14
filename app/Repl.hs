@@ -15,6 +15,6 @@ calc input =
     Right cmd ->
       case cmd of
         CommandCheck typedExp -> typecheck typedExp
-        CommandEval exp -> interpret exp
+        CommandEval exp -> show (interpret exp)
   where
     tokens = myLexer input
