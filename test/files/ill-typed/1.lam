@@ -1,0 +1,2 @@
+if (2 - (1 + 1)) then true else false
+if (2 - (1 + true)) then true else false
