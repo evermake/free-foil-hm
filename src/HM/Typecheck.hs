@@ -1,8 +1,8 @@
 module HM.Typecheck where
 
-import           HM.Parser.Abs
-import           HM.Parser.Print
-import           HM.Syntax       ()
+import           HM.Parser.Abs   (Type (..))
+import qualified HM.Parser.Print as Raw
+import           HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -14,21 +14,21 @@ import           HM.Syntax       ()
 -- Left "Right operand of + has type TBool but should have type Nat"
 -- >>> printTree <$> typecheck "2 - (1 + 1)" "Bool"
 -- Left "expected type\n  Bool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
-typecheck :: Exp -> Type -> Either String Type
+typecheck :: Exp n -> Type -> Either String Type
 typecheck e expectedType = do
   typeOfE <- inferType e
   if typeOfE == expectedType
     then return typeOfE
     else Left $ unlines
       [ "expected type"
-      , "  " ++ printTree expectedType
+      , "  " ++ show expectedType
       , "but got type"
-      , "  " ++ printTree typeOfE
+      , "  " ++ Raw.printTree typeOfE
       , "when typechecking expession"
-      , "  " ++ printTree e
+      , "  " ++ show e
       ]
 
-inferType :: Exp -> Either String Type
+inferType :: Exp n -> Either String Type
 inferType ETrue = return TBool
 inferType EFalse = return TBool
 inferType (ENat _) = return TNat

@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \+ | \- | \( | \) | \:
+@rsyms = \+ | \- | \( | \) | \: | \=
 
 :-
 
@@ -148,12 +148,13 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "Nat" 7
-    (b "-" 4
-       (b ")" 2 (b "(" 1 N N) (b "+" 3 N N)) (b "Bool" 6 (b ":" 5 N N) N))
-    (b "iszero" 11
-       (b "false" 9 (b "else" 8 N N) (b "if" 10 N N))
-       (b "true" 13 (b "then" 12 N N) N))
+  b "else" 9
+    (b ":" 5
+       (b "+" 3 (b ")" 2 (b "(" 1 N N) N) (b "-" 4 N N))
+       (b "Bool" 7 (b "=" 6 N N) (b "Nat" 8 N N)))
+    (b "iszero" 13
+       (b "if" 11 (b "false" 10 N N) (b "in" 12 N N))
+       (b "then" 15 (b "let" 14 N N) (b "true" 16 N N)))
   where
   b s n = B bs (TS bs n)
     where

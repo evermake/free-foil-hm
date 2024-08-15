@@ -137,8 +137,15 @@ instance Print Integer where
 instance Print Double where
   prt _ x = doc (shows x)
 
+instance Print HM.Parser.Abs.Ident where
+  prt _ (HM.Parser.Abs.Ident i) = doc $ showString i
+instance Print HM.Parser.Abs.Pattern where
+  prt i = \case
+    HM.Parser.Abs.PatternVar id_ -> prPrec i 0 (concatD [prt 0 id_])
+
 instance Print HM.Parser.Abs.Exp where
   prt i = \case
+    HM.Parser.Abs.EVar id_ -> prPrec i 3 (concatD [prt 0 id_])
     HM.Parser.Abs.ETrue -> prPrec i 3 (concatD [doc (showString "true")])
     HM.Parser.Abs.EFalse -> prPrec i 3 (concatD [doc (showString "false")])
     HM.Parser.Abs.ENat n -> prPrec i 3 (concatD [prt 0 n])
@@ -147,6 +154,11 @@ instance Print HM.Parser.Abs.Exp where
     HM.Parser.Abs.EIf exp1 exp2 exp3 -> prPrec i 1 (concatD [doc (showString "if"), prt 1 exp1, doc (showString "then"), prt 1 exp2, doc (showString "else"), prt 1 exp3])
     HM.Parser.Abs.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
     HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
+    HM.Parser.Abs.ELet pattern_ exp scopedexp -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 exp, doc (showString "in"), prt 0 scopedexp])
+
+instance Print HM.Parser.Abs.ScopedExp where
+  prt i = \case
+    HM.Parser.Abs.ScopedExp exp -> prPrec i 0 (concatD [prt 1 exp])
 
 instance Print HM.Parser.Abs.Type where
   prt i = \case

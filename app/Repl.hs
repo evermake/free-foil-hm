@@ -1,8 +1,8 @@
 module Main where
 
 import           HM.Eval
-import           HM.Parser.Abs
 import           HM.Parser.Par
+import           HM.Syntax     (toExpClosed)
 import           HM.Typecheck
 
 main :: IO ()
@@ -12,16 +12,12 @@ main = do
 
 repl :: String -> String
 repl input =
-  case pExp tokens of
+  case toExpClosed <$> pExp tokens of
     Left err -> "Parsing error: " ++ err
     Right e -> case inferType e of
       Left err -> "Typechecking error: " ++ err
       Right _type -> case eval e of
-        Left err -> "Evaluation error: " ++ err
-        Right outExp -> case outExp of
-          (ENat n) -> show n
-          ETrue    -> "true"
-          EFalse   -> "false"
-          other    -> show other
+        Left err     -> "Evaluation error: " ++ err
+        Right outExp -> show outExp
   where
     tokens = myLexer input

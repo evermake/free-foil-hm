@@ -1,9 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 module HM.Eval where
 
-import           HM.Parser.Abs
-import           HM.Parser.Print
-import           HM.Syntax       ()
+import           HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -13,7 +11,7 @@ import           HM.Syntax       ()
 -- Right "true"
 -- >>> printTree <$> eval "if (iszero (2 - (true + 1))) then true else 0"
 -- Left "Unsupported expression in addition"
-eval :: Exp -> Either String Exp
+eval :: Exp n -> Either String (Exp n)
 eval ETrue = Right ETrue
 eval EFalse = Right EFalse
 eval (ENat n) = Right (ENat n)
@@ -41,3 +39,10 @@ eval (EIsZero n) = eval n >>= \case
     | otherwise -> Right EFalse
   _       -> Left "Unsupported expression in iszero"
 eval (ETyped e _) = eval e
+-- eval (ELet x e1 e2) = do
+--   x' <- eval e1
+--   eval (substitute (x, x') e2)
+
+-- let x = 3 in
+-- let y = 4 in
+-- x + (y + (let x = 5 in x + y))

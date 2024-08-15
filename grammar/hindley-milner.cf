@@ -1,3 +1,6 @@
+PatternVar. Pattern ::= Ident ;
+
+EVar.    Exp3 ::= Ident ;
 ETrue.   Exp3 ::= "true" ;
 EFalse.  Exp3 ::= "false" ;
 ENat.    Exp3 ::= Integer ;
@@ -6,6 +9,9 @@ ESub.    Exp2 ::= Exp2 "-" Exp3 ;
 EIf.     Exp1 ::= "if" Exp1 "then" Exp1 "else" Exp1 ;
 EIsZero. Exp2 ::= "iszero" "(" Exp ")" ;
 ETyped.  Exp  ::= Exp1 ":" Type ;
+ELet.    Exp1 ::= "let" Pattern "=" Exp1 "in" ScopedExp ;
+
+ScopedExp. ScopedExp ::= Exp1 ;
 
 -- https://bnfc.readthedocs.io/en/latest/lbnf.html#coercions
 coercions Exp 3 ;

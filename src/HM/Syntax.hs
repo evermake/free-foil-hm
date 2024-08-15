@@ -1,28 +1,86 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE KindSignatures    #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE PatternSynonyms   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module HM.Syntax where
 
-import           Data.String   (IsString (..))
-import           HM.Parser.Abs
-import           HM.Parser.Par
+import           Data.Map (Map)
+import qualified Data.Map as Map
+import qualified Control.Monad.Foil as Foil
+import           Control.Monad.Free.Foil
+import           Control.Monad.Free.Foil.TH
+import           Data.Bifunctor.TH
+import           Data.String                (IsString (..))
+import qualified HM.Parser.Abs              as Raw
+import qualified HM.Parser.Par              as Raw
+import qualified HM.Parser.Print            as Raw
 
-instance IsString Exp where
-  fromString = unsafeParseExp
+-- $setup
+-- >>> :set -XOverloadedStrings
+-- >>> :set -XDataKinds
+-- >>> import qualified Control.Monad.Foil as Foil
+-- >>> import Control.Monad.Free.Foil
+-- >>> import Data.String (fromString)
 
-unsafeParseExp :: String -> Exp
-unsafeParseExp input =
-  case pExp tokens of
-    Left err -> error ("cannot parse Exp: " ++ err)
-    Right e  -> e
-  where
-    tokens = myLexer input
+-- * Generated code
 
-instance IsString Type where
-  fromString = unsafeParseType
+-- ** Signature
+mkSignature ''Raw.Exp ''Raw.Ident ''Raw.ScopedExp ''Raw.Pattern
+deriveZipMatch ''ExpSig
+deriveBifunctor ''ExpSig
+deriveBifoldable ''ExpSig
+deriveBitraversable ''ExpSig
 
-unsafeParseType :: String -> Type
-unsafeParseType input =
-  case pType tokens of
-    Left err    -> error ("cannot parse Type: " ++ err)
-    Right type_ -> type_
-  where
-    tokens = myLexer input
+-- ** Pattern synonyms
+mkPatternSynonyms ''ExpSig
+
+-- ** Conversion helpers
+
+mkConvertToFreeFoil ''Raw.Exp ''Raw.Ident ''Raw.ScopedExp ''Raw.Pattern
+mkConvertFromFreeFoil ''Raw.Exp ''Raw.Ident ''Raw.ScopedExp ''Raw.Pattern
+
+-- * User-defined code
+
+type Exp n = AST ExpSig n
+
+-- ** Conversion helpers
+
+-- | Convert 'Raw.Exp' into a scope-safe expression.
+-- This is a special case of 'convertToAST'.
+toExp :: Foil.Distinct n => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Exp -> AST ExpSig n
+toExp = convertToAST convertToExpSig getPatternBinder getExpFromScopedExp
+
+-- | Convert 'Raw.Exp' into a closed scope-safe expression.
+-- This is a special case of 'toExp'.
+toExpClosed :: Raw.Exp -> Exp Foil.VoidS
+toExpClosed = toExp Foil.emptyScope Map.empty
+
+-- | Convert a scope-safe representation back into 'Raw.Exp'.
+-- This is a special case of 'convertFromAST'.
+--
+-- 'Raw.VarIdent' names are generated based on the raw identifiers in the underlying foil representation.
+--
+-- This function does not recover location information for variables, patterns, or scoped terms.
+fromExp :: Exp n -> Raw.Exp
+fromExp = convertFromAST
+  convertFromExpSig
+  Raw.EVar
+  Raw.PatternVar
+  Raw.ScopedExp
+  (\n -> Raw.Ident ("x" ++ show n))
+
+-- | Parse scope-safe terms via raw representation.
+--
+-- >>> fromString "λx.λy.λx.x" :: Exp Foil.VoidS
+-- λ x0 . λ x1 . λ x2 . x2
+instance IsString (Exp Foil.VoidS) where
+  fromString input = case Raw.pExp (Raw.myLexer input) of
+    Left err   -> error ("could not parse expression: " <> input <> "\n  " <> err)
+    Right term -> toExpClosed term
+
+-- | Pretty-print scope-safe terms via raw representation.
+instance Show (Exp n) where
+  show = Raw.printTree . fromExp

@@ -29,6 +29,8 @@ build-tools:
 dependencies:
   base: ">= 4.7 && < 5"
   array: ">= 0.5.3.0"
+  bifunctors:
+  containers:
   free-foil: ">= 0.0.3"
 
 ghc-options:

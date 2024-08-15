@@ -8,10 +8,12 @@
 module HM.Parser.Par
   ( happyError
   , myLexer
+  , pPattern
   , pExp3
   , pExp2
   , pExp1
   , pExp
+  , pScopedExp
   , pType
   ) where
 
@@ -22,10 +24,12 @@ import HM.Parser.Lex
 
 }
 
+%name pPattern Pattern
 %name pExp3 Exp3
 %name pExp2 Exp2
 %name pExp1 Exp1
 %name pExp Exp
+%name pScopedExp ScopedExp
 %name pType Type
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
@@ -36,24 +40,35 @@ import HM.Parser.Lex
   '+'      { PT _ (TS _ 3)  }
   '-'      { PT _ (TS _ 4)  }
   ':'      { PT _ (TS _ 5)  }
-  'Bool'   { PT _ (TS _ 6)  }
-  'Nat'    { PT _ (TS _ 7)  }
-  'else'   { PT _ (TS _ 8)  }
-  'false'  { PT _ (TS _ 9)  }
-  'if'     { PT _ (TS _ 10) }
-  'iszero' { PT _ (TS _ 11) }
-  'then'   { PT _ (TS _ 12) }
-  'true'   { PT _ (TS _ 13) }
+  '='      { PT _ (TS _ 6)  }
+  'Bool'   { PT _ (TS _ 7)  }
+  'Nat'    { PT _ (TS _ 8)  }
+  'else'   { PT _ (TS _ 9)  }
+  'false'  { PT _ (TS _ 10) }
+  'if'     { PT _ (TS _ 11) }
+  'in'     { PT _ (TS _ 12) }
+  'iszero' { PT _ (TS _ 13) }
+  'let'    { PT _ (TS _ 14) }
+  'then'   { PT _ (TS _ 15) }
+  'true'   { PT _ (TS _ 16) }
+  L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
 
 %%
 
+Ident :: { HM.Parser.Abs.Ident }
+Ident  : L_Ident { HM.Parser.Abs.Ident $1 }
+
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
 
+Pattern :: { HM.Parser.Abs.Pattern }
+Pattern : Ident { HM.Parser.Abs.PatternVar $1 }
+
 Exp3 :: { HM.Parser.Abs.Exp }
 Exp3
-  : 'true' { HM.Parser.Abs.ETrue }
+  : Ident { HM.Parser.Abs.EVar $1 }
+  | 'true' { HM.Parser.Abs.ETrue }
   | 'false' { HM.Parser.Abs.EFalse }
   | Integer { HM.Parser.Abs.ENat $1 }
   | '(' Exp ')' { $2 }
@@ -68,10 +83,14 @@ Exp2
 Exp1 :: { HM.Parser.Abs.Exp }
 Exp1
   : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
+  | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
   | Exp2 { $1 }
 
 Exp :: { HM.Parser.Abs.Exp }
 Exp : Exp1 ':' Type { HM.Parser.Abs.ETyped $1 $3 } | Exp1 { $1 }
+
+ScopedExp :: { HM.Parser.Abs.ScopedExp }
+ScopedExp : Exp1 { HM.Parser.Abs.ScopedExp $1 }
 
 Type :: { HM.Parser.Abs.Type }
 Type
