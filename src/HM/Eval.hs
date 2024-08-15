@@ -1,6 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 module HM.Eval where
 
+import           Control.Monad.Foil      (Distinct, Scope, addSubst,
+                                          identitySubst)
+import           Control.Monad.Free.Foil (AST (Var), substitute)
 import           HM.Syntax
 
 -- $setup
@@ -11,38 +14,36 @@ import           HM.Syntax
 -- Right "true"
 -- >>> printTree <$> eval "if (iszero (2 - (true + 1))) then true else 0"
 -- Left "Unsupported expression in addition"
-eval :: Exp n -> Either String (Exp n)
-eval ETrue = Right ETrue
-eval EFalse = Right EFalse
-eval (ENat n) = Right (ENat n)
-eval (EAdd l r) = do
-  l' <- eval l
-  r' <- eval r
+eval :: Distinct n => Scope n -> Exp n -> Either String (Exp n)
+eval _scope (Var x) = Right (Var x)
+eval _scope ETrue = Right ETrue
+eval _scope EFalse = Right EFalse
+eval _scope (ENat n) = Right (ENat n)
+eval scope (EAdd l r) = do
+  l' <- eval scope l
+  r' <- eval scope r
   case (l', r') of
     (ENat x, ENat y) -> Right (ENat (x + y))
     _                -> Left "Unsupported expression in addition"
-eval (ESub l r) = do
-  l' <- eval l
-  r' <- eval r
+eval scope (ESub l r) = do
+  l' <- eval scope l
+  r' <- eval scope r
   case (l', r') of
     (ENat x, ENat y) -> Right (ENat (x - y))
     _                -> Left "Unsupported expression in subtraction"
-eval (EIf cond then_ else_) = do
-  cond' <- eval cond
+eval scope (EIf cond then_ else_) = do
+  cond' <- eval scope cond
   case cond' of
-    ETrue  -> eval then_
-    EFalse -> eval else_
+    ETrue  -> eval scope then_
+    EFalse -> eval scope else_
     _      -> Left "Unsupported condition in if statement"
-eval (EIsZero n) = eval n >>= \case
+eval scope (EIsZero n) = eval scope n >>= \case
   ENat n'
     | n' == 0   -> Right ETrue
     | otherwise -> Right EFalse
   _       -> Left "Unsupported expression in iszero"
-eval (ETyped e _) = eval e
--- eval (ELet x e1 e2) = do
---   x' <- eval e1
---   eval (substitute (x, x') e2)
-
--- let x = 3 in
--- let y = 4 in
--- x + (y + (let x = 5 in x + y))
+eval scope (ETyped e _) = eval scope e
+eval scope (ELet e1 x e2) = do
+  e1' <- eval scope e1
+  let subst = addSubst identitySubst x e1'
+  eval scope (substitute scope subst e2)

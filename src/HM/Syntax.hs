@@ -7,12 +7,12 @@
 {-# LANGUAGE TemplateHaskell   #-}
 module HM.Syntax where
 
-import           Data.Map (Map)
-import qualified Data.Map as Map
-import qualified Control.Monad.Foil as Foil
+import qualified Control.Monad.Foil         as Foil
 import           Control.Monad.Free.Foil
 import           Control.Monad.Free.Foil.TH
 import           Data.Bifunctor.TH
+import           Data.Map                   (Map)
+import qualified Data.Map                   as Map
 import           Data.String                (IsString (..))
 import qualified HM.Parser.Abs              as Raw
 import qualified HM.Parser.Par              as Raw
@@ -36,6 +36,8 @@ deriveBitraversable ''ExpSig
 
 -- ** Pattern synonyms
 mkPatternSynonyms ''ExpSig
+
+{-# COMPLETE Var, ETrue, EFalse, ENat, EAdd, ESub, EIf, EIsZero, ETyped, ELet #-}
 
 -- ** Conversion helpers
 

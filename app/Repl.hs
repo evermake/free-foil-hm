@@ -1,8 +1,9 @@
 module Main where
 
+import           Control.Monad.Foil (emptyScope)
 import           HM.Eval
 import           HM.Parser.Par
-import           HM.Syntax     (toExpClosed)
+import           HM.Syntax          (toExpClosed)
 import           HM.Typecheck
 
 main :: IO ()
@@ -16,7 +17,7 @@ repl input =
     Left err -> "Parsing error: " ++ err
     Right e -> case inferType e of
       Left err -> "Typechecking error: " ++ err
-      Right _type -> case eval e of
+      Right _type -> case eval emptyScope e of
         Left err     -> "Evaluation error: " ++ err
         Right outExp -> show outExp
   where
