@@ -15,3 +15,14 @@ unsafeParseExp input =
     Right e  -> e
   where
     tokens = myLexer input
+
+instance IsString Type where
+  fromString = unsafeParseType
+
+unsafeParseType :: String -> Type
+unsafeParseType input =
+  case pType tokens of
+    Left err    -> error ("cannot parse Type: " ++ err)
+    Right type_ -> type_
+  where
+    tokens = myLexer input

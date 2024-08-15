@@ -34,6 +34,7 @@ library
       HM.Parser.Lex
       HM.Parser.Par
       HM.Parser.Print
+      HM.Syntax
       HM.Typecheck
   other-modules:
       Paths_free_foil_hm

@@ -1,46 +1,51 @@
 module HM.Typecheck where
 
-import HM.Parser.Abs
+import           HM.Parser.Abs
+import           HM.Parser.Print
+import           HM.Syntax       ()
+
+-- $setup
+-- >>> :set -XOverloadedStrings
 
 -- | Typechecks an expression and maybe returns an error.
-typecheck :: Exp -> Maybe String
-typecheck e = case inferType e of
-  Left _ -> Nothing
-  Right err -> Just err
+-- >>> printTree <$> typecheck "2 - (1 + 1)" "Nat"
+-- Right "Nat"
+-- >>> printTree <$> typecheck "2 - (1 + true)" "Nat"
+-- Left "Right operand of + has type TBool but should have type Nat"
+-- >>> printTree <$> typecheck "2 - (1 + 1)" "Bool"
+-- Left "expected type\n  Bool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
+typecheck :: Exp -> Type -> Either String Type
+typecheck e expectedType = do
+  typeOfE <- inferType e
+  if typeOfE == expectedType
+    then return typeOfE
+    else Left $ unlines
+      [ "expected type"
+      , "  " ++ printTree expectedType
+      , "but got type"
+      , "  " ++ printTree typeOfE
+      , "when typechecking expession"
+      , "  " ++ printTree e
+      ]
 
-inferType :: Exp -> Either Type String
-inferType ETrue = Left TBool
-inferType EFalse = Left TBool
-inferType (ENat _) = Left TNat
-inferType (EIf eCond eThen eElse) = case inferType eCond of
-  Left TBool -> case inferType eThen of
-    Left tThen -> case inferType eElse of
-      Left tElse ->
-        if tThen == tElse
-          then Left tThen
-          else Right "If branches types do not match"
-      Right err -> Right err
-    Right err -> Right err
-  Left t -> Right $ "Condition of if has type " ++ show t ++ " but should have type Bool"
-  Right err -> Right err
-inferType (EAdd l r) = case inferType l of
-  Left TNat -> case inferType r of
-    Left TNat -> Left TNat
-    Left t -> Right $ "Right operand of + has type " ++ show t ++ " but should have type Nat"
-    Right err -> Right err
-  Left t -> Right $ "Left operand of + has type " ++ show t ++ " but should have type Nat"
-  Right err -> Right err
-inferType (ESub l r) = case inferType l of
-  Left TNat -> case inferType r of
-    Left TNat -> Left TNat
-    Left t -> Right $ "Right operand of - has type " ++ show t ++ " but should have type Nat"
-    Right err -> Right err
-  Left t -> Right $ "Left operand of - has type " ++ show t ++ " but should have type Nat"
-  Right err -> Right err
-inferType (EIsZero e) = case inferType e of
-  Left TNat -> Left TBool
-  Left t -> Right $ "Operand of iszero has type " ++ show t ++ " but should have type Nat"
-  Right err -> Right err
-inferType (ETyped e t) = case inferType e of
-  Left t' -> if t == t' then Left t else Right $ "Expression has type " ++ show t' ++ " but should have type " ++ show t
-  Right err -> Right err
+inferType :: Exp -> Either String Type
+inferType ETrue = return TBool
+inferType EFalse = return TBool
+inferType (ENat _) = return TNat
+inferType (EIf eCond eThen eElse) = do
+  typecheck eCond TBool
+  typeOfThen <- inferType eThen
+  typecheck eElse typeOfThen
+  return typeOfThen
+inferType (EAdd l r) = do
+  typecheck l TNat
+  typecheck r TNat
+  return TNat
+inferType (ESub l r) = do
+  typecheck l TNat
+  typecheck r TNat
+  return TNat
+inferType (EIsZero e) = do
+  typecheck e TNat
+  return TBool
+inferType (ETyped e t) = typecheck e t
