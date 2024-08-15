@@ -6,15 +6,22 @@ import HM.Parser.Par
 import HM.Typecheck
 
 main :: IO ()
-main = interact (unlines . map calc . lines)
+main = do
+  putStrLn "Welcome to REPL!\n"
+  interact (unlines . map repl . lines)
 
-calc :: String -> String
-calc input =
-  "-- " ++ case pCommand tokens of
-    Left err -> "ERROR: " ++ err
-    Right cmd ->
-      case cmd of
-        CommandCheck typedExp -> typecheck typedExp
-        CommandEval exp -> show (interpret exp)
+repl :: String -> String
+repl input =
+  case pExp tokens of
+    Left err -> "Parsing error: " ++ err
+    Right e -> case typecheck e of
+      Just err -> "Typechecking error: " ++ err
+      Nothing -> case eval e of
+        Left err -> "Evaluation error: " ++ err
+        Right outExp -> case outExp of
+          (ENat n) -> show n
+          ETrue -> "true"
+          EFalse -> "false"
+          other -> show other
   where
     tokens = myLexer input

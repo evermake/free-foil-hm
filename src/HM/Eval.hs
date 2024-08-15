@@ -2,24 +2,25 @@ module HM.Eval where
 
 import HM.Parser.Abs
 
-interpret :: Exp -> Either String Exp
-interpret ETrue = Right ETrue
-interpret EFalse = Right EFalse
-interpret (ENat n) = Right (ENat n)
-interpret (EAdd l r) =
-  case (interpret l, interpret r) of
+eval :: Exp -> Either String Exp
+eval ETrue = Right ETrue
+eval EFalse = Right EFalse
+eval (ENat n) = Right (ENat n)
+eval (EAdd l r) =
+  case (eval l, eval r) of
     (Right (ENat l'), Right (ENat r')) -> Right (ENat (l' + r'))
     _ -> Left "Unsupported expression in addition"
-interpret (ESub l r) =
-  case (interpret l, interpret r) of
+eval (ESub l r) =
+  case (eval l, eval r) of
     (Right (ENat l'), Right (ENat r')) -> Right (ENat (l' - r'))
     _ -> Left "Unsupported expression in subtraction"
-interpret (EIf cond then_ else_) =
-  case interpret cond of
-    Right ETrue -> interpret then_
-    Right EFalse -> interpret else_
+eval (EIf cond then_ else_) =
+  case eval cond of
+    Right ETrue -> eval then_
+    Right EFalse -> eval else_
     _ -> Left "Unsupported condition in if statement"
-interpret (EIsZero n) =
-  case interpret n of
+eval (EIsZero n) =
+  case eval n of
     Right (ENat n') -> if n' == 0 then Right ETrue else Right EFalse
     _ -> Left "Unsupported expression in iszero"
+eval (ETyped e _) = eval e

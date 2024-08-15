@@ -137,24 +137,16 @@ instance Print Integer where
 instance Print Double where
   prt _ x = doc (shows x)
 
-instance Print HM.Parser.Abs.Command where
-  prt i = \case
-    HM.Parser.Abs.CommandCheck typedexp -> prPrec i 0 (concatD [doc (showString "check"), prt 0 typedexp])
-    HM.Parser.Abs.CommandEval exp -> prPrec i 0 (concatD [doc (showString "eval"), prt 0 exp])
-
-instance Print HM.Parser.Abs.TypedExp where
-  prt i = \case
-    HM.Parser.Abs.TypedExp exp type_ -> prPrec i 0 (concatD [prt 0 exp, doc (showString "::"), prt 0 type_])
-
 instance Print HM.Parser.Abs.Exp where
   prt i = \case
-    HM.Parser.Abs.ETrue -> prPrec i 2 (concatD [doc (showString "true")])
-    HM.Parser.Abs.EFalse -> prPrec i 2 (concatD [doc (showString "false")])
-    HM.Parser.Abs.ENat n -> prPrec i 2 (concatD [prt 0 n])
-    HM.Parser.Abs.EAdd exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, doc (showString "+"), prt 2 exp2])
-    HM.Parser.Abs.ESub exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, doc (showString "-"), prt 2 exp2])
-    HM.Parser.Abs.EIf exp1 exp2 exp3 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 exp1, doc (showString "then"), prt 0 exp2, doc (showString "else"), prt 0 exp3])
+    HM.Parser.Abs.ETrue -> prPrec i 3 (concatD [doc (showString "true")])
+    HM.Parser.Abs.EFalse -> prPrec i 3 (concatD [doc (showString "false")])
+    HM.Parser.Abs.ENat n -> prPrec i 3 (concatD [prt 0 n])
+    HM.Parser.Abs.EAdd exp1 exp2 -> prPrec i 2 (concatD [prt 2 exp1, doc (showString "+"), prt 3 exp2])
+    HM.Parser.Abs.ESub exp1 exp2 -> prPrec i 2 (concatD [prt 2 exp1, doc (showString "-"), prt 3 exp2])
+    HM.Parser.Abs.EIf exp1 exp2 exp3 -> prPrec i 1 (concatD [doc (showString "if"), prt 1 exp1, doc (showString "then"), prt 1 exp2, doc (showString "else"), prt 1 exp3])
     HM.Parser.Abs.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
+    HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
 
 instance Print HM.Parser.Abs.Type where
   prt i = \case

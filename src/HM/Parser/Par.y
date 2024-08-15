@@ -8,8 +8,7 @@
 module HM.Parser.Par
   ( happyError
   , myLexer
-  , pCommand
-  , pTypedExp
+  , pExp3
   , pExp2
   , pExp1
   , pExp
@@ -23,8 +22,7 @@ import HM.Parser.Lex
 
 }
 
-%name pCommand Command
-%name pTypedExp TypedExp
+%name pExp3 Exp3
 %name pExp2 Exp2
 %name pExp1 Exp1
 %name pExp Exp
@@ -37,17 +35,15 @@ import HM.Parser.Lex
   ')'      { PT _ (TS _ 2)  }
   '+'      { PT _ (TS _ 3)  }
   '-'      { PT _ (TS _ 4)  }
-  '::'     { PT _ (TS _ 5)  }
+  ':'      { PT _ (TS _ 5)  }
   'Bool'   { PT _ (TS _ 6)  }
   'Nat'    { PT _ (TS _ 7)  }
-  'check'  { PT _ (TS _ 8)  }
-  'else'   { PT _ (TS _ 9)  }
-  'eval'   { PT _ (TS _ 10) }
-  'false'  { PT _ (TS _ 11) }
-  'if'     { PT _ (TS _ 12) }
-  'iszero' { PT _ (TS _ 13) }
-  'then'   { PT _ (TS _ 14) }
-  'true'   { PT _ (TS _ 15) }
+  'else'   { PT _ (TS _ 8)  }
+  'false'  { PT _ (TS _ 9)  }
+  'if'     { PT _ (TS _ 10) }
+  'iszero' { PT _ (TS _ 11) }
+  'then'   { PT _ (TS _ 12) }
+  'true'   { PT _ (TS _ 13) }
   L_integ  { PT _ (TI $$)   }
 
 %%
@@ -55,32 +51,27 @@ import HM.Parser.Lex
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
 
-Command :: { HM.Parser.Abs.Command }
-Command
-  : 'check' TypedExp { HM.Parser.Abs.CommandCheck $2 }
-  | 'eval' Exp { HM.Parser.Abs.CommandEval $2 }
-
-TypedExp :: { HM.Parser.Abs.TypedExp }
-TypedExp : Exp '::' Type { HM.Parser.Abs.TypedExp $1 $3 }
-
-Exp2 :: { HM.Parser.Abs.Exp }
-Exp2
+Exp3 :: { HM.Parser.Abs.Exp }
+Exp3
   : 'true' { HM.Parser.Abs.ETrue }
   | 'false' { HM.Parser.Abs.EFalse }
   | Integer { HM.Parser.Abs.ENat $1 }
-  | 'iszero' '(' Exp ')' { HM.Parser.Abs.EIsZero $3 }
   | '(' Exp ')' { $2 }
+
+Exp2 :: { HM.Parser.Abs.Exp }
+Exp2
+  : Exp2 '+' Exp3 { HM.Parser.Abs.EAdd $1 $3 }
+  | Exp2 '-' Exp3 { HM.Parser.Abs.ESub $1 $3 }
+  | 'iszero' '(' Exp ')' { HM.Parser.Abs.EIsZero $3 }
+  | Exp3 { $1 }
 
 Exp1 :: { HM.Parser.Abs.Exp }
 Exp1
-  : Exp1 '+' Exp2 { HM.Parser.Abs.EAdd $1 $3 }
-  | Exp1 '-' Exp2 { HM.Parser.Abs.ESub $1 $3 }
+  : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
   | Exp2 { $1 }
 
 Exp :: { HM.Parser.Abs.Exp }
-Exp
-  : 'if' Exp 'then' Exp 'else' Exp { HM.Parser.Abs.EIf $2 $4 $6 }
-  | Exp1 { $1 }
+Exp : Exp1 ':' Type { HM.Parser.Abs.ETyped $1 $3 } | Exp1 { $1 }
 
 Type :: { HM.Parser.Abs.Type }
 Type

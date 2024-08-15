@@ -1,16 +1,14 @@
-CommandCheck. Command ::= "check" TypedExp ;
-CommandEval.  Command ::= "eval" Exp ;
+ETrue.   Exp3 ::= "true" ;
+EFalse.  Exp3 ::= "false" ;
+ENat.    Exp3 ::= Integer ;
+EAdd.    Exp2 ::= Exp2 "+" Exp3 ;
+ESub.    Exp2 ::= Exp2 "-" Exp3 ;
+EIf.     Exp1 ::= "if" Exp1 "then" Exp1 "else" Exp1 ;
+EIsZero. Exp2 ::= "iszero" "(" Exp ")" ;
+ETyped.  Exp  ::= Exp1 ":" Type ;
 
-TypedExp. TypedExp ::= Exp "::" Type ;
-
-ETrue.    Exp2 ::= "true" ;
-EFalse.   Exp2 ::= "false" ;
-ENat.     Exp2 ::= Integer ;
-EAdd.     Exp1 ::= Exp1 "+" Exp2 ;
-ESub.     Exp1 ::= Exp1 "-" Exp2 ;
-EIf.      Exp  ::= "if" Exp "then" Exp "else" Exp ;
-EIsZero.  Exp2 ::= "iszero" "(" Exp ")" ;
-coercions Exp 2 ;
+-- https://bnfc.readthedocs.io/en/latest/lbnf.html#coercions
+coercions Exp 3 ;
 
 TNat.  Type ::= "Nat" ;
 TBool. Type ::= "Bool" ;

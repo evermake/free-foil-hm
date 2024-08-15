@@ -13,12 +13,6 @@ import qualified Prelude as C (Eq, Ord, Show, Read)
 import qualified Data.Data    as C (Data, Typeable)
 import qualified GHC.Generics as C (Generic)
 
-data Command = CommandCheck TypedExp | CommandEval Exp
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
-
-data TypedExp = TypedExp Exp Type
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
-
 data Exp
     = ETrue
     | EFalse
@@ -27,6 +21,7 @@ data Exp
     | ESub Exp Exp
     | EIf Exp Exp Exp
     | EIsZero Exp
+    | ETyped Exp Type
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data Type = TNat | TBool
