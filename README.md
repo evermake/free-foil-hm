@@ -20,15 +20,15 @@ stack build
 
 ### 1. Simply-typed expressions
 
-- [ ] Simple expressions grammar and parsing
-  - [ ] Natural number literals
-  - [ ] Boolean literals
-  - [ ] Addition (`+`)
-  - [ ] iszero
-  - [ ] if-then-else
-- [ ] Evaluation
-- [ ] Typechecking (e.g. `(1 + true)` should trigger a type error)
-- [ ] REPL
+- [x] Simple expressions grammar and parsing
+  - [x] Natural number literals
+  - [x] Boolean literals
+  - [x] Addition (`+`)
+  - [x] iszero
+  - [x] if-then-else
+- [x] Evaluation
+- [x] Typechecking (e.g. `(1 + true)` should trigger a type error)
+- [x] REPL
 
 ### 2. Let-bindings with variables
 
