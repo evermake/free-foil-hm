@@ -8,11 +8,11 @@ import           HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
--- >>> import HM.Parser.Print
+-- >>> import Control.Monad.Foil (emptyScope)
 
--- >>> printTree <$> eval "if (iszero (2 - (1 + 1))) then true else 0"
+-- >>> eval emptyScope "if (iszero (2 - (1 + 1))) then true else 0"
 -- Right "true"
--- >>> printTree <$> eval "if (iszero (2 - (true + 1))) then true else 0"
+-- >>> eval emptyScope "if (iszero (2 - (true + 1))) then true else 0"
 -- Left "Unsupported expression in addition"
 eval :: Distinct n => Scope n -> Exp n -> Either String (Exp n)
 eval _scope (Var x) = Right (Var x)

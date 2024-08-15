@@ -1,19 +1,24 @@
+{-# LANGUAGE DataKinds #-}
 module HM.Typecheck where
 
-import           HM.Parser.Abs   (Type (..))
-import qualified HM.Parser.Print as Raw
+import qualified Control.Monad.Foil as Foil
+import           HM.Parser.Abs      (Type (..))
+import qualified HM.Parser.Print    as Raw
 import           HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
 
 -- | Typechecks an expression and maybe returns an error.
--- >>> printTree <$> typecheck "2 - (1 + 1)" "Nat"
--- Right "Nat"
--- >>> printTree <$> typecheck "2 - (1 + true)" "Nat"
--- Left "Right operand of + has type TBool but should have type Nat"
--- >>> printTree <$> typecheck "2 - (1 + 1)" "Bool"
--- Left "expected type\n  Bool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
+-- >>> typecheckClosed "2 - (1 + 1)" TNat
+-- >>> typecheckClosed "2 - (1 + true)" TNat
+-- >>> typecheckClosed "2 - (1 + 1)" TBool
+-- Right TNat
+-- Left "expected type\n  TNat\nbut got type\n  Bool\nwhen typechecking expession\n  true\n"
+-- Left "expected type\n  TBool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
+typecheckClosed :: Exp Foil.VoidS -> Type -> Either String Type
+typecheckClosed = typecheck
+
 typecheck :: Exp n -> Type -> Either String Type
 typecheck e expectedType = do
   typeOfE <- inferType e
