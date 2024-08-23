@@ -30,6 +30,7 @@ custom-setup
 library
   exposed-modules:
       HM.Eval
+      HM.Interpret
       HM.Parser.Abs
       HM.Parser.Lex
       HM.Parser.Par
