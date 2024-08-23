@@ -1,2 +1,1 @@
 if iszero (2 - (1 + 1)) then true else false
-let x = 1 in let y = 2 in x + (let x = 3 in x + y)
