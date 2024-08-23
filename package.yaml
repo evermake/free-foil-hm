@@ -76,5 +76,17 @@ tests:
     main: Main.hs
     other-modules: []
     dependencies:
-      - free-foil
+      - free-foil-hm
       - doctest-parallel
+
+  spec:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - free-foil-hm
+      - hspec
+      - hspec-discover
