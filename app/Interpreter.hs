@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Monad.Foil (emptyScope)
+import Control.Monad.Foil (emptyNameMap, emptyScope)
 import HM.Eval
 import HM.Parser.Par
 import HM.Syntax (toExpClosed)
@@ -22,9 +22,10 @@ main = do
 
 run :: String -> Result
 run input =
+  
   case toExpClosed <$> pExp tokens of
     Left err -> Failure 1 ("Parsing error: " ++ err)
-    Right e -> case inferType e of
+    Right e -> case inferType emptyNameMap e of
       Left err -> Failure 2 ("Typechecking error: " ++ err)
       Right _type -> case eval emptyScope e of
         Left err -> Failure 3 ("Evaluation error: " ++ err)
