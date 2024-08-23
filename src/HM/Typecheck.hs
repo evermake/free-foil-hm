@@ -1,10 +1,12 @@
 {-# LANGUAGE DataKinds #-}
+
 module HM.Typecheck where
 
 import qualified Control.Monad.Foil as Foil
-import           HM.Parser.Abs      (Type (..))
-import qualified HM.Parser.Print    as Raw
-import           HM.Syntax
+import qualified Control.Monad.Free.Foil as FreeFoil
+import HM.Parser.Abs (Type (..))
+import qualified HM.Parser.Print as Raw
+import HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -24,33 +26,36 @@ typecheck e expectedType = do
   typeOfE <- inferType e
   if typeOfE == expectedType
     then return typeOfE
-    else Left $ unlines
-      [ "expected type"
-      , "  " ++ show expectedType
-      , "but got type"
-      , "  " ++ Raw.printTree typeOfE
-      , "when typechecking expession"
-      , "  " ++ show e
-      ]
+    else
+      Left $
+        unlines
+          [ "expected type",
+            "  " ++ show expectedType,
+            "but got type",
+            "  " ++ Raw.printTree typeOfE,
+            "when typechecking expession",
+            "  " ++ show e
+          ]
 
 inferType :: Exp n -> Either String Type
 inferType ETrue = return TBool
 inferType EFalse = return TBool
 inferType (ENat _) = return TNat
 inferType (EIf eCond eThen eElse) = do
-  typecheck eCond TBool
+  _ <- typecheck eCond TBool
   typeOfThen <- inferType eThen
-  typecheck eElse typeOfThen
+  _ <- typecheck eElse typeOfThen
   return typeOfThen
 inferType (EAdd l r) = do
-  typecheck l TNat
-  typecheck r TNat
+  _ <- typecheck l TNat
+  _ <- typecheck r TNat
   return TNat
 inferType (ESub l r) = do
-  typecheck l TNat
-  typecheck r TNat
+  _ <- typecheck l TNat
+  _ <- typecheck r TNat
   return TNat
 inferType (EIsZero e) = do
-  typecheck e TNat
+  _ <- typecheck e TNat
   return TBool
-inferType (ETyped e t) = typecheck e t
+inferType (FreeFoil.Var _) = error "Type inference for 'Var' is not implemented"
+inferType (FreeFoil.Node _) = error "Type inference for 'Node' is not implemented"
