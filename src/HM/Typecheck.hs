@@ -2,31 +2,33 @@
 
 module HM.Typecheck where
 
-import Control.Monad.Foil (NameMap, addNameBinder, emptyNameMap, lookupName)
-import qualified Control.Monad.Foil as Foil
+import           Control.Monad.Foil      (NameMap, addNameBinder, emptyNameMap,
+                                          lookupName)
+import qualified Control.Monad.Foil      as Foil
 import qualified Control.Monad.Free.Foil as FreeFoil
-import HM.Parser.Abs (Type (..))
-import qualified HM.Parser.Print as Raw
-import HM.Syntax
+import           HM.Parser.Abs           (Type (..))
+import qualified HM.Parser.Print         as Raw
+import           HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
+-- >>> import HM.Parser.Abs (Type (..))
 
 -- | Typechecks an expression and maybe returns an error.
 -- >>> typecheckClosed "2 - (1 + 1)" TNat
--- >>> typecheckClosed "2 - (1 + true)" TNat
--- >>> typecheckClosed "2 - (1 + 1)" TBool
--- >>> typecheckClosed "let x = 1 in let y = 2 in x + (let x = 3 in x + y)" TNat
 -- Right TNat
+-- >>> typecheckClosed "2 - (1 + true)" TNat
 -- Left "expected type\n  TNat\nbut got type\n  Bool\nwhen typechecking expession\n  true\n"
+-- >>> typecheckClosed "2 - (1 + 1)" TBool
 -- Left "expected type\n  TBool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
+-- >>> typecheckClosed "let x = 1 in let y = 2 in x + (let x = 3 in x + y)" TNat
 -- Right TNat
 typecheckClosed :: Exp Foil.VoidS -> Type -> Either String Type
 typecheckClosed = typecheck emptyNameMap
 
 typecheck :: NameMap n Type -> Exp n -> Type -> Either String Type
-typecheck _scope e expectedType = do
-  typeOfE <- inferType _scope e
+typecheck scope e expectedType = do
+  typeOfE <- inferType scope e
   if typeOfE == expectedType
     then return typeOfE
     else
@@ -44,25 +46,26 @@ inferType :: NameMap n Type -> Exp n -> Either String Type
 inferType _scope ETrue = return TBool
 inferType _scope EFalse = return TBool
 inferType _scope (ENat _) = return TNat
-inferType _scope (EIf eCond eThen eElse) = do
-  _ <- typecheck _scope eCond TBool
-  typeOfThen <- inferType _scope eThen
-  _ <- typecheck _scope eElse typeOfThen
+inferType scope (EIf eCond eThen eElse) = do
+  _ <- typecheck scope eCond TBool
+  typeOfThen <- inferType scope eThen
+  _ <- typecheck scope eElse typeOfThen
   return typeOfThen
-inferType _scope (EAdd l r) = do
-  _ <- typecheck _scope l TNat
-  _ <- typecheck _scope r TNat
+inferType scope (EAdd l r) = do
+  _ <- typecheck scope l TNat
+  _ <- typecheck scope r TNat
   return TNat
-inferType _scope (ESub l r) = do
-  _ <- typecheck _scope l TNat
-  _ <- typecheck _scope r TNat
+inferType scope (ESub l r) = do
+  _ <- typecheck scope l TNat
+  _ <- typecheck scope r TNat
   return TNat
-inferType _scope (EIsZero e) = do
-  _ <- typecheck _scope e TNat
+inferType scope (EIsZero e) = do
+  _ <- typecheck scope e TNat
   return TBool
-inferType _scope (ELet pat e se) = do
-  patt <- inferType _scope pat
-  let newScope = addNameBinder e patt _scope
-  inferType newScope se
-inferType _scope (FreeFoil.Var n) = Right $ lookupName n _scope
-inferType _scope (FreeFoil.Node _) = error "Type inference for 'Node' is not implemented"
+inferType scope (ELet e1 x e2) = do             -- Γ ⊢ let x = e1 in e2 : ?
+  type1 <- inferType scope e1                   -- Γ ⊢ e1 : type1
+  let newScope = addNameBinder x type1 scope    -- Γ' = Γ, x : type1
+  inferType newScope e2                         -- Γ' ⊢ e2 : ?
+inferType scope (ETyped expr type_) = do
+  typecheck scope expr type_
+inferType scope (FreeFoil.Var n) = Right (lookupName n scope)   -- Γ, x : T ⊢ x : T

@@ -76,8 +76,8 @@ fromExp = convertFromAST
 
 -- | Parse scope-safe terms via raw representation.
 --
--- >>> fromString "λx.λy.λx.x" :: Exp Foil.VoidS
--- λ x0 . λ x1 . λ x2 . x2
+-- >>> fromString "let x = 2 + 2 in let y = x - 1 in let x = 3 in y + x + y" :: Exp Foil.VoidS
+-- let x0 = 2 + 2 in let x1 = x0 - 1 in let x2 = 3 in x1 + x2 + x1
 instance IsString (Exp Foil.VoidS) where
   fromString input = case Raw.pExp (Raw.myLexer input) of
     Left err   -> error ("could not parse expression: " <> input <> "\n  " <> err)

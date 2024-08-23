@@ -67,3 +67,14 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - free-foil-hm
+
+tests:
+  doctests:
+    source-dirs:
+      - src/
+      - test/doctests
+    main: Main.hs
+    other-modules: []
+    dependencies:
+      - free-foil
+      - doctest-parallel
