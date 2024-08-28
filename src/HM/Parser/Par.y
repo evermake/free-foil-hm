@@ -39,18 +39,21 @@ import HM.Parser.Lex
   ')'      { PT _ (TS _ 2)  }
   '+'      { PT _ (TS _ 3)  }
   '-'      { PT _ (TS _ 4)  }
-  ':'      { PT _ (TS _ 5)  }
-  '='      { PT _ (TS _ 6)  }
-  'Bool'   { PT _ (TS _ 7)  }
-  'Nat'    { PT _ (TS _ 8)  }
-  'else'   { PT _ (TS _ 9)  }
-  'false'  { PT _ (TS _ 10) }
-  'if'     { PT _ (TS _ 11) }
-  'in'     { PT _ (TS _ 12) }
-  'iszero' { PT _ (TS _ 13) }
-  'let'    { PT _ (TS _ 14) }
-  'then'   { PT _ (TS _ 15) }
-  'true'   { PT _ (TS _ 16) }
+  '->'     { PT _ (TS _ 5)  }
+  '.'      { PT _ (TS _ 6)  }
+  ':'      { PT _ (TS _ 7)  }
+  '='      { PT _ (TS _ 8)  }
+  'Bool'   { PT _ (TS _ 9)  }
+  'Nat'    { PT _ (TS _ 10) }
+  'else'   { PT _ (TS _ 11) }
+  'false'  { PT _ (TS _ 12) }
+  'if'     { PT _ (TS _ 13) }
+  'in'     { PT _ (TS _ 14) }
+  'iszero' { PT _ (TS _ 15) }
+  'let'    { PT _ (TS _ 16) }
+  'then'   { PT _ (TS _ 17) }
+  'true'   { PT _ (TS _ 18) }
+  'λ'      { PT _ (TS _ 19) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
 
@@ -84,6 +87,8 @@ Exp1 :: { HM.Parser.Abs.Exp }
 Exp1
   : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
   | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
+  | 'λ' Ident ':' Type '.' Exp1 { HM.Parser.Abs.EAbs $2 $4 $6 }
+  | Exp1 Type Exp1 { HM.Parser.Abs.EApp $1 $2 $3 }
   | Exp2 { $1 }
 
 Exp :: { HM.Parser.Abs.Exp }
@@ -94,7 +99,9 @@ ScopedExp : Exp1 { HM.Parser.Abs.ScopedExp $1 }
 
 Type :: { HM.Parser.Abs.Type }
 Type
-  : 'Nat' { HM.Parser.Abs.TNat } | 'Bool' { HM.Parser.Abs.TBool }
+  : 'Nat' { HM.Parser.Abs.TNat }
+  | 'Bool' { HM.Parser.Abs.TBool }
+  | Type '->' Type { HM.Parser.Abs.TArrow $1 $3 }
 
 {
 

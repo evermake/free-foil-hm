@@ -2,13 +2,17 @@
 
 module HM.Typecheck where
 
-import           Control.Monad.Foil      (NameMap, addNameBinder, emptyNameMap,
-                                          lookupName)
-import qualified Control.Monad.Foil      as Foil
+import Control.Monad.Foil
+  ( NameMap,
+    addNameBinder,
+    emptyNameMap,
+    lookupName,
+  )
+import qualified Control.Monad.Foil as Foil
 import qualified Control.Monad.Free.Foil as FreeFoil
-import           HM.Parser.Abs           (Type (..))
-import qualified HM.Parser.Print         as Raw
-import           HM.Syntax
+import HM.Parser.Abs (Type (..))
+import qualified HM.Parser.Print as Raw
+import HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -62,10 +66,13 @@ inferType scope (ESub l r) = do
 inferType scope (EIsZero e) = do
   _ <- typecheck scope e TNat
   return TBool
-inferType scope (ELet e1 x e2) = do             -- Γ ⊢ let x = e1 in e2 : ?
-  type1 <- inferType scope e1                   -- Γ ⊢ e1 : type1
-  let newScope = addNameBinder x type1 scope    -- Γ' = Γ, x : type1
-  inferType newScope e2                         -- Γ' ⊢ e2 : ?
+inferType scope (ELet e1 x e2) = do
+  -- Γ ⊢ let x = e1 in e2 : ?
+  type1 <- inferType scope e1 -- Γ ⊢ e1 : type1
+  let newScope = addNameBinder x type1 scope -- Γ' = Γ, x : type1
+  inferType newScope e2 -- Γ' ⊢ e2 : ?
 inferType scope (ETyped expr type_) = do
   typecheck scope expr type_
-inferType scope (FreeFoil.Var n) = Right (lookupName n scope)   -- Γ, x : T ⊢ x : T
+inferType scope (FreeFoil.Var n) = Right (lookupName n scope) -- Γ, x : T ⊢ x : T
+inferType scope (EApp e1 _ e2) = undefined
+inferType scope (EAbs x type_ e) = undefined

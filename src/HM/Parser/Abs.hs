@@ -29,12 +29,14 @@ data Exp
     | EIsZero Exp
     | ETyped Exp Type
     | ELet Pattern Exp ScopedExp
+    | EAbs Ident Type Exp
+    | EApp Exp Type Exp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data ScopedExp = ScopedExp Exp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
-data Type = TNat | TBool
+data Type = TNat | TBool | TArrow Type Type
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 newtype Ident = Ident String

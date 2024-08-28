@@ -155,6 +155,8 @@ instance Print HM.Parser.Abs.Exp where
     HM.Parser.Abs.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
     HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
     HM.Parser.Abs.ELet pattern_ exp scopedexp -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 exp, doc (showString "in"), prt 0 scopedexp])
+    HM.Parser.Abs.EAbs id_ type_ exp -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 id_, doc (showString ":"), prt 0 type_, doc (showString "."), prt 1 exp])
+    HM.Parser.Abs.EApp exp1 type_ exp2 -> prPrec i 1 (concatD [prt 1 exp1, prt 0 type_, prt 1 exp2])
 
 instance Print HM.Parser.Abs.ScopedExp where
   prt i = \case
@@ -164,3 +166,4 @@ instance Print HM.Parser.Abs.Type where
   prt i = \case
     HM.Parser.Abs.TNat -> prPrec i 0 (concatD [doc (showString "Nat")])
     HM.Parser.Abs.TBool -> prPrec i 0 (concatD [doc (showString "Bool")])
+    HM.Parser.Abs.TArrow type_1 type_2 -> prPrec i 0 (concatD [prt 0 type_1, doc (showString "->"), prt 0 type_2])
