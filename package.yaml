@@ -90,3 +90,5 @@ tests:
       - free-foil-hm
       - hspec
       - hspec-discover
+      - directory
+      - filepath
