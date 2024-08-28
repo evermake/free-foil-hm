@@ -29,8 +29,8 @@ data Exp
     | EIsZero Exp
     | ETyped Exp Type
     | ELet Pattern Exp ScopedExp
-    | EAbs Ident Type Exp
-    | EApp Exp Type Exp
+    | EAbs Pattern Type ScopedExp
+    | EApp Exp Exp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data ScopedExp = ScopedExp Exp

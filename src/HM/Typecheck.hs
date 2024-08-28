@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 
 module HM.Typecheck where
 
@@ -47,14 +48,10 @@ typecheck scope e expectedType = do
           ]
 
 inferType :: NameMap n Type -> Exp n -> Either String Type
+inferType scope (FreeFoil.Var n) = Right (lookupName n scope) -- Γ, x : T ⊢ x : T
 inferType _scope ETrue = return TBool
 inferType _scope EFalse = return TBool
 inferType _scope (ENat _) = return TNat
-inferType scope (EIf eCond eThen eElse) = do
-  _ <- typecheck scope eCond TBool
-  typeOfThen <- inferType scope eThen
-  _ <- typecheck scope eElse typeOfThen
-  return typeOfThen
 inferType scope (EAdd l r) = do
   _ <- typecheck scope l TNat
   _ <- typecheck scope r TNat
@@ -63,16 +60,30 @@ inferType scope (ESub l r) = do
   _ <- typecheck scope l TNat
   _ <- typecheck scope r TNat
   return TNat
+inferType scope (EIf eCond eThen eElse) = do
+  _ <- typecheck scope eCond TBool
+  typeOfThen <- inferType scope eThen
+  _ <- typecheck scope eElse typeOfThen
+  return typeOfThen
 inferType scope (EIsZero e) = do
   _ <- typecheck scope e TNat
   return TBool
+inferType scope (ETyped expr type_) = do
+  typecheck scope expr type_
 inferType scope (ELet e1 x e2) = do
   -- Γ ⊢ let x = e1 in e2 : ?
   type1 <- inferType scope e1 -- Γ ⊢ e1 : type1
   let newScope = addNameBinder x type1 scope -- Γ' = Γ, x : type1
   inferType newScope e2 -- Γ' ⊢ e2 : ?
-inferType scope (ETyped expr type_) = do
-  typecheck scope expr type_
-inferType scope (FreeFoil.Var n) = Right (lookupName n scope) -- Γ, x : T ⊢ x : T
-inferType scope (EApp e1 _ e2) = undefined
-inferType scope (EAbs x type_ e) = undefined
+inferType scope (EAbs type_ x e) = do
+  -- Γ ⊢ λx : type_. e : ?
+  let newScope = addNameBinder x type_ scope -- Γ' = Γ, x : type_
+  TArrow type_ <$> inferType newScope e
+inferType scope (EApp e1 e2) = do
+  -- (Γ ⊢ e1) (Γ ⊢ e2) : ?
+  type1 <- inferType scope e1 -- Γ ⊢ e1 : type1
+  case type1 of
+    TArrow type_ types -> do
+      _ <- typecheck scope e2 type_
+      return types
+    _ -> Left ("expected type\n  TArrow\nbut got type\n  " <> show type1)
