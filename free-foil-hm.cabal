@@ -134,6 +134,8 @@ test-suite spec
     , base >=4.7 && <5
     , bifunctors
     , containers
+    , directory
+    , filepath
     , free-foil >=0.0.3
     , free-foil-hm
     , hspec

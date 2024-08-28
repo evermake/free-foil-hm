@@ -1,32 +1,50 @@
 module HM.InterpretSpec where
 
-import           Test.Hspec
 import Control.Monad (forM_)
-import           HM.Interpret
+import HM.Interpret
+import System.Directory
+import System.FilePath
+import Test.Hspec
+
+spec :: Spec
+spec = parallel $ do
+  describe "well-typed expressions" $ do
+    paths <- runIO (testFilesInDir "./test/files/well-typed")
+    forM_ paths $ \path -> it path $ do
+      contents <- readFile path
+      interpret contents `shouldSatisfy` isSuccess
+
+  describe "ill-typed expressions" $ do
+    paths <- runIO (testFilesInDir "./test/files/ill-typed")
+    forM_ paths $ \path -> it path $ do
+      contents <- readFile path
+      interpret contents `shouldSatisfy` isTypeError
 
 isSuccess :: Result -> Bool
-isSuccess Success{} = True
+isSuccess Success {} = True
 isSuccess _ = False
 
 isTypeError :: Result -> Bool
 isTypeError (Failure TypecheckingError _) = True
 isTypeError _ = False
 
-wellTypedPaths :: [FilePath]
-wellTypedPaths = ["well-typed/1.lam", "well-typed/2.lam"]
+testFilesInDir :: FilePath -> IO [FilePath]
+testFilesInDir dir = do
+  let isTestFile = \f -> return $ takeExtension f == ".lam"
+  dirWalk isTestFile dir
 
-illTypedPaths :: [FilePath]
-illTypedPaths = ["ill-typed/1.lam", "ill-typed/2.lam"]
-
-spec :: Spec
-spec = do
-
-  describe "well-typed expressions" $ do
-    forM_ wellTypedPaths $ \path -> it path $ do
-      contents <- readFile ("test/files/" ++ path)
-      interpret contents `shouldSatisfy` isSuccess
-
-  describe "ill-typed expressions" $ do
-    forM_ illTypedPaths $ \path -> it path $ do
-      contents <- readFile ("test/files/" ++ path)
-      interpret contents `shouldSatisfy` isTypeError
+dirWalk :: (FilePath -> IO Bool) -> FilePath -> IO [FilePath]
+dirWalk filefunc top = do
+  isDirectory <- doesDirectoryExist top
+  if isDirectory
+    then do
+      -- Files preserving full path with `top`
+      files <- map (top </>) <$> listDirectory top
+      paths <- mapM (dirWalk filefunc) files
+      return $ concat paths
+    else do
+      included <- filefunc top
+      return $
+        if included
+          then [top]
+          else []
