@@ -69,3 +69,9 @@ inferType scope (ELet e1 x e2) = do             -- Γ ⊢ let x = e1 in e2 : ?
 inferType scope (ETyped expr type_) = do
   typecheck scope expr type_
 inferType scope (FreeFoil.Var n) = Right (lookupName n scope)   -- Γ, x : T ⊢ x : T
+inferType scope (EFor e1 e2 x expr) = do 
+  _ <- typecheck scope e1 TNat
+  _ <- typecheck scope e2 TNat
+  let newScope = addNameBinder x TNat scope
+  inferType newScope expr
+

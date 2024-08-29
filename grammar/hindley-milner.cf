@@ -10,6 +10,7 @@ EIf.     Exp1 ::= "if" Exp1 "then" Exp1 "else" Exp1 ;
 EIsZero. Exp2 ::= "iszero" "(" Exp ")" ;
 ETyped.  Exp  ::= Exp1 ":" Type ;
 ELet.    Exp1 ::= "let" Pattern "=" Exp1 "in" ScopedExp ;
+EFor.    Exp1 ::= "for" Pattern "in" "[" Exp1 ".." Exp1 "]" "do" ScopedExp ;
 
 ScopedExp. ScopedExp ::= Exp1 ;
 

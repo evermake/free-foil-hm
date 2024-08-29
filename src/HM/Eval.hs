@@ -47,3 +47,11 @@ eval scope (ELet e1 x e2) = do
   e1' <- eval scope e1
   let subst = addSubst identitySubst x e1'
   eval scope (substitute scope subst e2)
+eval scope (EFor e1 e2 x expr) = do
+  e1_val <- eval scope e1
+  e2_val <- eval scope e2
+  let ys = [e1_val..e2_val]
+  map (\y -> do
+    let subst = addSubst identitySubst x y
+    eval scope (substitute scope subst expr)
+    ) ys
