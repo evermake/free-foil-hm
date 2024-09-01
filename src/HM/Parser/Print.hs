@@ -175,7 +175,7 @@ instance Print HM.Parser.Abs.Exp where
     HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
     HM.Parser.Abs.ELet pattern_ exp scopedexp -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 exp, doc (showString "in"), prt 0 scopedexp])
     HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 pattern_, doc (showString ":"), prt 0 type_, doc (showString "."), prt 0 scopedexp])
-    HM.Parser.Abs.EApp exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, prt 1 exp2])
+    HM.Parser.Abs.EApp exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, prt 2 exp2])
 
 instance Print HM.Parser.Abs.ScopedExp where
   prt i = \case

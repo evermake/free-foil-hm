@@ -55,7 +55,7 @@ All other symbols are terminals.
   | //Exp1// | -> | ``if`` //Exp1// ``then`` //Exp1// ``else`` //Exp1//
   |  |  **|**  | ``let`` //Pattern// ``=`` //Exp1// ``in`` //ScopedExp//
   |  |  **|**  | ``λ`` //Pattern// ``:`` //Type// ``.`` //ScopedExp//
-  |  |  **|**  | //Exp1// //Exp1//
+  |  |  **|**  | //Exp1// //Exp2//
   |  |  **|**  | //Exp2//
   | //Exp// | -> | //Exp1// ``:`` //Type//
   |  |  **|**  | //Exp1//

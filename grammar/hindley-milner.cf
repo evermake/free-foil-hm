@@ -11,7 +11,7 @@ EIsZero. Exp2 ::= "iszero" "(" Exp ")" ;
 ETyped.  Exp  ::= Exp1 ":" Type ;
 ELet.    Exp1 ::= "let" Pattern "=" Exp1 "in" ScopedExp ;
 EAbs.    Exp1 ::= "λ" Pattern ":" Type "." ScopedExp ;
-EApp.    Exp1 ::= Exp1 Exp1 ;
+EApp.    Exp1 ::= Exp1 Exp2 ;
 
 ScopedExp. ScopedExp ::= Exp1 ;
 

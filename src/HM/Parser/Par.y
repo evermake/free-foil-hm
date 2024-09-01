@@ -88,7 +88,7 @@ Exp1
   : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
   | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
   | 'λ' Pattern ':' Type '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 $6 }
-  | Exp1 Exp1 { HM.Parser.Abs.EApp $1 $2 }
+  | Exp1 Exp2 { HM.Parser.Abs.EApp $1 $2 }
   | Exp2 { $1 }
 
 Exp :: { HM.Parser.Abs.Exp }
