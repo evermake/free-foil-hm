@@ -10,6 +10,8 @@ EIf.     Exp1 ::= "if" Exp1 "then" Exp1 "else" Exp1 ;
 EIsZero. Exp2 ::= "iszero" "(" Exp ")" ;
 ETyped.  Exp  ::= Exp1 ":" Type ;
 ELet.    Exp1 ::= "let" Pattern "=" Exp1 "in" ScopedExp ;
+EAbs.    Exp1 ::= "λ" Pattern ":" Type "." ScopedExp ;
+EApp.    Exp1 ::= Exp1 Exp2 ;
 
 ScopedExp. ScopedExp ::= Exp1 ;
 
@@ -18,3 +20,4 @@ coercions Exp 3 ;
 
 TNat.  Type ::= "Nat" ;
 TBool. Type ::= "Bool" ;
+TArrow. Type ::= Type "->" Type ;

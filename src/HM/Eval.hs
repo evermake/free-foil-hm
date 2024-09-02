@@ -1,10 +1,15 @@
 {-# LANGUAGE LambdaCase #-}
+
 module HM.Eval where
 
-import           Control.Monad.Foil      (Distinct, Scope, addSubst,
-                                          identitySubst)
-import           Control.Monad.Free.Foil (AST (Var), substitute)
-import           HM.Syntax
+import Control.Monad.Foil
+  ( Distinct,
+    Scope,
+    addSubst,
+    identitySubst,
+  )
+import Control.Monad.Free.Foil (AST (Var), substitute)
+import HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -14,7 +19,7 @@ import           HM.Syntax
 -- Right "true"
 -- >>> eval emptyScope "if (iszero (2 - (true + 1))) then true else 0"
 -- Left "Unsupported expression in addition"
-eval :: Distinct n => Scope n -> Exp n -> Either String (Exp n)
+eval :: (Distinct n) => Scope n -> Exp n -> Either String (Exp n)
 eval _scope (Var x) = Right (Var x)
 eval _scope ETrue = Right ETrue
 eval _scope EFalse = Right EFalse
@@ -24,26 +29,36 @@ eval scope (EAdd l r) = do
   r' <- eval scope r
   case (l', r') of
     (ENat x, ENat y) -> Right (ENat (x + y))
-    _                -> Left "Unsupported expression in addition"
+    _ -> Left "Unsupported expression in addition"
 eval scope (ESub l r) = do
   l' <- eval scope l
   r' <- eval scope r
   case (l', r') of
     (ENat x, ENat y) -> Right (ENat (x - y))
-    _                -> Left "Unsupported expression in subtraction"
+    _ -> Left "Unsupported expression in subtraction"
 eval scope (EIf cond then_ else_) = do
   cond' <- eval scope cond
   case cond' of
-    ETrue  -> eval scope then_
+    ETrue -> eval scope then_
     EFalse -> eval scope else_
-    _      -> Left "Unsupported condition in if statement"
-eval scope (EIsZero n) = eval scope n >>= \case
-  ENat n'
-    | n' == 0   -> Right ETrue
-    | otherwise -> Right EFalse
-  _       -> Left "Unsupported expression in iszero"
+    _ -> Left "Unsupported condition in if statement"
+eval scope (EIsZero n) =
+  eval scope n >>= \case
+    ENat n'
+      | n' == 0 -> Right ETrue
+      | otherwise -> Right EFalse
+    _ -> Left "Unsupported expression in iszero"
 eval scope (ETyped e _) = eval scope e
 eval scope (ELet e1 x e2) = do
   e1' <- eval scope e1
   let subst = addSubst identitySubst x e1'
   eval scope (substitute scope subst e2)
+eval _scope (EAbs type_ x e) = Right (EAbs type_ x e)
+eval scope (EApp e1 e2) = do
+  e1' <- eval scope e1
+  e2' <- eval scope e2
+  case e1' of
+    EAbs _ x e -> do
+      let subst = addSubst identitySubst x e2'
+      eval scope (substitute scope subst e)
+    _ -> Left "Unsupported expression in application"
