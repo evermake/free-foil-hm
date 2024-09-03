@@ -22,282 +22,283 @@ import qualified Data.Array
 alex_tab_size :: Int
 alex_tab_size = 8
 alex_base :: Data.Array.Array Int Int
-alex_base = Data.Array.listArray (0 :: Int, 7)
+alex_base = Data.Array.listArray (0 :: Int, 8)
   [ -8
-  , 140
-  , -42
-  , -46
-  , -13
-  , 171
+  , -181
   , 0
-  , -170
+  , -2
+  , -13
+  , -50
+  , -35
+  , 140
+  , -23
   ]
 
 alex_table :: Data.Array.Array Int Int
-alex_table = Data.Array.listArray (0 :: Int, 426)
+alex_table = Data.Array.listArray (0 :: Int, 395)
   [ 0
-  , 5
-  , 5
-  , 5
-  , 5
-  , 5
+  , 3
+  , 3
+  , 3
+  , 3
+  , 3
   , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
+  , 3
+  , 3
+  , 3
+  , 3
+  , 3
   , 2
   , 6
   , 6
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 5
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
   , 6
   , 6
-  , 0
   , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 2
+  , 3
+  , 0
+  , 0
+  , 0
+  , 0
   , 0
   , 3
-  , 6
   , 0
   , 2
   , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 2
-  , 6
   , 0
+  , 2
+  , 0
+  , 5
+  , 8
   , 0
   , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 6
+  , 2
+  , 0
+  , 0
+  , 2
   , 0
   , 0
   , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 2
+  , 0
+  , 2
   , 0
   , 0
   , 0
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
   , 0
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
   , 0
-  , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 5
-  , 5
-  , 5
-  , 5
-  , 5
-  , 0
-  , 0
-  , 4
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
   , 7
   , 0
   , 0
   , 0
   , 0
-  , 5
   , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
+  , 0
+  , 0
+  , 4
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
   , 1
   , 0
   , 0
   , 0
   , 0
-  , 1
   , 0
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
-  , 1
+  , 0
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 0
+  , 0
+  , 0
+  , 0
+  , 7
+  , 0
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
+  , 7
   , 0
   , 0
   , 0
@@ -371,37 +372,6 @@ alex_table = Data.Array.listArray (0 :: Int, 426)
   , 0
   , 0
   , 4
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
-  , 0
   , 0
   , 0
   , 0
@@ -465,13 +435,20 @@ alex_table = Data.Array.listArray (0 :: Int, 426)
   ]
 
 alex_check :: Data.Array.Array Int Int
-alex_check = Data.Array.listArray (0 :: Int, 426)
+alex_check = Data.Array.listArray (0 :: Int, 395)
   [ -1
   , 9
   , 10
   , 11
   , 12
   , 13
+  , 187
+  , 9
+  , 10
+  , 11
+  , 12
+  , 13
+  , 62
   , 48
   , 49
   , 50
@@ -482,21 +459,14 @@ alex_check = Data.Array.listArray (0 :: Int, 426)
   , 55
   , 56
   , 57
-  , 62
-  , 187
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
+  , 46
   , 32
   , -1
   , -1
   , -1
   , -1
   , -1
-  , -1
+  , 32
   , -1
   , 40
   , 41
@@ -549,9 +519,9 @@ alex_check = Data.Array.listArray (0 :: Int, 426)
   , 88
   , 89
   , 90
+  , 91
   , -1
-  , -1
-  , -1
+  , 93
   , -1
   , -1
   , -1
@@ -646,11 +616,11 @@ alex_check = Data.Array.listArray (0 :: Int, 426)
   , 190
   , 191
   , 39
-  , 9
-  , 10
-  , 11
-  , 12
-  , 13
+  , -1
+  , -1
+  , -1
+  , -1
+  , -1
   , -1
   , -1
   , 195
@@ -669,7 +639,7 @@ alex_check = Data.Array.listArray (0 :: Int, 426)
   , -1
   , -1
   , -1
-  , 32
+  , -1
   , -1
   , 65
   , 66
@@ -862,41 +832,10 @@ alex_check = Data.Array.listArray (0 :: Int, 426)
   , -1
   , -1
   , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
-  , -1
   ]
 
 alex_deflt :: Data.Array.Array Int Int
-alex_deflt = Data.Array.listArray (0 :: Int, 7)
+alex_deflt = Data.Array.listArray (0 :: Int, 8)
   [ -1
   , -1
   , -1
@@ -905,23 +844,26 @@ alex_deflt = Data.Array.listArray (0 :: Int, 7)
   , -1
   , -1
   , -1
+  , -1
   ]
 
-alex_accept = Data.Array.listArray (0 :: Int, 7)
+alex_accept = Data.Array.listArray (0 :: Int, 8)
   [ AlexAccNone
+  , AlexAccNone
+  , AlexAcc 4
+  , AlexAccSkip
+  , AlexAccNone
   , AlexAcc 3
   , AlexAcc 2
   , AlexAcc 1
-  , AlexAccNone
-  , AlexAccSkip
   , AlexAcc 0
-  , AlexAccNone
   ]
 
-alex_actions = Data.Array.array (0 :: Int, 4)
-  [ (3,alex_action_2)
+alex_actions = Data.Array.array (0 :: Int, 5)
+  [ (4,alex_action_1)
+  , (3,alex_action_1)
   , (2,alex_action_3)
-  , (1,alex_action_1)
+  , (1,alex_action_2)
   , (0,alex_action_1)
   ]
 
@@ -1262,13 +1204,18 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "Nat" 10
-    (b "->" 5
-       (b "+" 3 (b ")" 2 (b "(" 1 N N) N) (b "-" 4 N N))
-       (b "=" 8 (b ":" 7 (b "." 6 N N) N) (b "Bool" 9 N N)))
-    (b "iszero" 15
-       (b "if" 13 (b "false" 12 (b "else" 11 N N) N) (b "in" 14 N N))
-       (b "true" 18 (b "then" 17 (b "let" 16 N N) N) (b "\955" 19 N N)))
+  b "]" 13
+    (b ".." 7
+       (b "-" 4
+          (b ")" 2 (b "(" 1 N N) (b "+" 3 N N)) (b "." 6 (b "->" 5 N N) N))
+       (b "Bool" 10
+          (b "=" 9 (b ":" 8 N N) N) (b "[" 12 (b "Nat" 11 N N) N)))
+    (b "in" 19
+       (b "false" 16
+          (b "else" 15 (b "do" 14 N N) N) (b "if" 18 (b "for" 17 N N) N))
+       (b "then" 22
+          (b "let" 21 (b "iszero" 20 N N) N)
+          (b "\955" 24 (b "true" 23 N N) N)))
   where
   b s n = B bs (TS bs n)
     where

@@ -28,7 +28,7 @@ $u = [. \n]          -- universal: any character
 
 -- Symbols and non-identifier-like reserved words
 
-@rsyms = \λ | \+ | \- | \( | \) | \: | \= | \. | \- \>
+@rsyms = \λ | \+ | \- | \( | \) | \: | \= | \. | \[ | \. \. | \] | \- \>
 
 :-
 
@@ -148,13 +148,18 @@ eitherResIdent tv s = treeFind resWords
 -- | The keywords and symbols of the language organized as binary search tree.
 resWords :: BTree
 resWords =
-  b "Nat" 10
-    (b "->" 5
-       (b "+" 3 (b ")" 2 (b "(" 1 N N) N) (b "-" 4 N N))
-       (b "=" 8 (b ":" 7 (b "." 6 N N) N) (b "Bool" 9 N N)))
-    (b "iszero" 15
-       (b "if" 13 (b "false" 12 (b "else" 11 N N) N) (b "in" 14 N N))
-       (b "true" 18 (b "then" 17 (b "let" 16 N N) N) (b "\955" 19 N N)))
+  b "]" 13
+    (b ".." 7
+       (b "-" 4
+          (b ")" 2 (b "(" 1 N N) (b "+" 3 N N)) (b "." 6 (b "->" 5 N N) N))
+       (b "Bool" 10
+          (b "=" 9 (b ":" 8 N N) N) (b "[" 12 (b "Nat" 11 N N) N)))
+    (b "in" 19
+       (b "false" 16
+          (b "else" 15 (b "do" 14 N N) N) (b "if" 18 (b "for" 17 N N) N))
+       (b "then" 22
+          (b "let" 21 (b "iszero" 20 N N) N)
+          (b "\955" 24 (b "true" 23 N N) N)))
   where
   b s n = B bs (TS bs n)
     where

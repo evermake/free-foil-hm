@@ -37,6 +37,7 @@ transExp x = case x of
   HM.Parser.Abs.ELet pattern_ exp scopedexp -> failure x
   HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> failure x
   HM.Parser.Abs.EApp exp1 exp2 -> failure x
+  HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> failure x
 
 transScopedExp :: HM.Parser.Abs.ScopedExp -> Result
 transScopedExp x = case x of

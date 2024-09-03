@@ -41,19 +41,24 @@ import HM.Parser.Lex
   '-'      { PT _ (TS _ 4)  }
   '->'     { PT _ (TS _ 5)  }
   '.'      { PT _ (TS _ 6)  }
-  ':'      { PT _ (TS _ 7)  }
-  '='      { PT _ (TS _ 8)  }
-  'Bool'   { PT _ (TS _ 9)  }
-  'Nat'    { PT _ (TS _ 10) }
-  'else'   { PT _ (TS _ 11) }
-  'false'  { PT _ (TS _ 12) }
-  'if'     { PT _ (TS _ 13) }
-  'in'     { PT _ (TS _ 14) }
-  'iszero' { PT _ (TS _ 15) }
-  'let'    { PT _ (TS _ 16) }
-  'then'   { PT _ (TS _ 17) }
-  'true'   { PT _ (TS _ 18) }
-  'λ'      { PT _ (TS _ 19) }
+  '..'     { PT _ (TS _ 7)  }
+  ':'      { PT _ (TS _ 8)  }
+  '='      { PT _ (TS _ 9)  }
+  'Bool'   { PT _ (TS _ 10) }
+  'Nat'    { PT _ (TS _ 11) }
+  '['      { PT _ (TS _ 12) }
+  ']'      { PT _ (TS _ 13) }
+  'do'     { PT _ (TS _ 14) }
+  'else'   { PT _ (TS _ 15) }
+  'false'  { PT _ (TS _ 16) }
+  'for'    { PT _ (TS _ 17) }
+  'if'     { PT _ (TS _ 18) }
+  'in'     { PT _ (TS _ 19) }
+  'iszero' { PT _ (TS _ 20) }
+  'let'    { PT _ (TS _ 21) }
+  'then'   { PT _ (TS _ 22) }
+  'true'   { PT _ (TS _ 23) }
+  'λ'      { PT _ (TS _ 24) }
   L_Ident  { PT _ (TV $$)   }
   L_integ  { PT _ (TI $$)   }
 
@@ -89,6 +94,7 @@ Exp1
   | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
   | 'λ' Pattern ':' Type '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 $6 }
   | Exp1 Exp2 { HM.Parser.Abs.EApp $1 $2 }
+  | 'for' Pattern 'in' '[' Exp1 '..' Exp1 ']' 'do' ScopedExp { HM.Parser.Abs.EFor $2 $5 $7 $10 }
   | Exp2 { $1 }
 
 Exp :: { HM.Parser.Abs.Exp }
