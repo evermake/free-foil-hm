@@ -86,9 +86,8 @@ inferType scope (EApp e1 e2) = do
       _ <- typecheck scope e2 type_
       return types
     _ -> Left ("expected type\n  TArrow\nbut got type\n  " <> show type1)
-inferType scope (EFor e1 e2 x expr) = do 
+inferType scope (EFor e1 e2 x expr) = do
   _ <- typecheck scope e1 TNat
   _ <- typecheck scope e2 TNat
   let newScope = addNameBinder x TNat scope
   inferType newScope expr
-

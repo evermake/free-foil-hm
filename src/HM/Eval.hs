@@ -2,11 +2,15 @@
 
 module HM.Eval where
 
-import           Control.Monad           (forM)
-import           Control.Monad.Foil      (Distinct, Scope, addSubst,
-                                          identitySubst)
-import           Control.Monad.Free.Foil (AST (Var), substitute)
-import           HM.Syntax
+import Control.Monad (forM)
+import Control.Monad.Foil
+  ( Distinct,
+    Scope,
+    addSubst,
+    identitySubst,
+  )
+import Control.Monad.Free.Foil (AST (Var), substitute)
+import HM.Syntax
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -50,6 +54,15 @@ eval scope (ELet e1 x e2) = do
   e1' <- eval scope e1
   let subst = addSubst identitySubst x e1'
   eval scope (substitute scope subst e2)
+eval _scope (EAbs type_ x e) = Right (EAbs type_ x e)
+eval scope (EApp e1 e2) = do
+  e1' <- eval scope e1
+  e2' <- eval scope e2
+  case e1' of
+    EAbs _ x e -> do
+      let subst = addSubst identitySubst x e2'
+      eval scope (substitute scope subst e)
+    _ -> Left "Unsupported expression in application"
 eval scope (EFor e1 e2 x expr) = do
   e1_val <- eval scope e1
   e2_val <- eval scope e2
@@ -60,13 +73,4 @@ eval scope (EFor e1 e2 x expr) = do
         let subst = addSubst identitySubst x (ENat y)
         eval scope (substitute scope subst expr)
       return (last results)
-    _ -> Left "invalid range"
-eval _scope (EAbs type_ x e) = Right (EAbs type_ x e)
-eval scope (EApp e1 e2) = do
-  e1' <- eval scope e1
-  e2' <- eval scope e2
-  case e1' of
-    EAbs _ x e -> do
-      let subst = addSubst identitySubst x e2'
-      eval scope (substitute scope subst e)
-    _ -> Left "Unsupported expression in application"
+    _ -> Left "Invalid expression in the range of for-loop"
