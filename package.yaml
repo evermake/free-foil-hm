@@ -35,6 +35,7 @@ dependencies:
 
 ghc-options:
   - -Wall
+  - -Werror
 
 library:
   source-dirs: src
