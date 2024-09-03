@@ -40,7 +40,7 @@ deriveBitraversable ''ExpSig
 
 mkPatternSynonyms ''ExpSig
 
-{-# COMPLETE Var, ETrue, EFalse, ENat, EAdd, ESub, EIf, EIsZero, ETyped, ELet #-}
+{-# COMPLETE Var, ETrue, EFalse, ENat, EAdd, ESub, EIf, EIsZero, ETyped, ELet, EAbs, EApp, EFor #-}
 
 -- ** Conversion helpers
 

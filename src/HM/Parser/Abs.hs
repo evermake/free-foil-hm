@@ -31,6 +31,7 @@ data Exp
     | ELet Pattern Exp ScopedExp
     | EAbs Pattern Type ScopedExp
     | EApp Exp Exp
+    | EFor Pattern Exp Exp ScopedExp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data ScopedExp = ScopedExp Exp

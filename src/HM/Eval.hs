@@ -2,6 +2,7 @@
 
 module HM.Eval where
 
+import Control.Monad (forM)
 import Control.Monad.Foil
   ( Distinct,
     Scope,
@@ -62,3 +63,14 @@ eval scope (EApp e1 e2) = do
       let subst = addSubst identitySubst x e2'
       eval scope (substitute scope subst e)
     _ -> Left "Unsupported expression in application"
+eval scope (EFor e1 e2 x expr) = do
+  e1_val <- eval scope e1
+  e2_val <- eval scope e2
+  case (e1_val, e2_val) of
+    (ENat from, ENat to) -> do
+      let ys = [from .. to]
+      results <- forM ys $ \y -> do
+        let subst = addSubst identitySubst x (ENat y)
+        eval scope (substitute scope subst expr)
+      return (last results)
+    _ -> Left "Invalid expression in the range of for-loop"

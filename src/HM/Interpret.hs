@@ -1,10 +1,10 @@
 module HM.Interpret where
 
-import           Control.Monad.Foil (emptyNameMap, emptyScope)
-import           HM.Eval
-import           HM.Parser.Par
-import           HM.Syntax          (toExpClosed)
-import           HM.Typecheck
+import Control.Monad.Foil (emptyNameMap, emptyScope)
+import HM.Eval
+import HM.Parser.Par
+import HM.Syntax (toExpClosed)
+import HM.Typecheck
 
 data Result
   = Success String -- Output of evaluation.
@@ -24,7 +24,7 @@ interpret input =
     Right e -> case inferType emptyNameMap e of
       Left err -> Failure TypecheckingError ("Typechecking error: " ++ err)
       Right _type -> case eval emptyScope e of
-        Left err     -> Failure EvaluationError ("Evaluation error: " ++ err)
+        Left err -> Failure EvaluationError ("Evaluation error: " ++ err)
         Right outExp -> Success (show outExp)
   where
     tokens = myLexer input
