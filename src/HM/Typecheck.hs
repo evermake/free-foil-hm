@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds #-}
-{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 
 module HM.Typecheck where
 
