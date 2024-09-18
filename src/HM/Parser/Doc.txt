@@ -21,6 +21,10 @@ Integer literals //Integer// are nonempty sequences of digits.
 
 
 
+UVarIdent literals are recognized by the regular expression
+`````'?' letter ('_' | digit | letter)*`````
+
+
 ===Reserved words and symbols===
 The set of reserved words is the set of terminals appearing in the grammar. Those reserved words that consist of non-letter characters are called symbols, and they are treated in a different way from those that are similar to identifiers. The lexer follows rules familiar from languages like Haskell, C, and Java, including longest match and spacing conventions.
 
@@ -63,9 +67,13 @@ All other symbols are terminals.
   | //Exp// | -> | //Exp1// ``:`` //Type//
   |  |  **|**  | //Exp1//
   | //ScopedExp// | -> | //Exp1//
-  | //Type// | -> | ``Nat``
+  | //Type// | -> | //UVarIdent//
+  |  |  **|**  | ``Nat``
   |  |  **|**  | ``Bool``
   |  |  **|**  | //Type// ``->`` //Type//
+  |  |  **|**  | //Ident//
+  | //ScopedType// | -> | //Type//
+  | //TypePattern// | -> | //Ident//
 
 
 

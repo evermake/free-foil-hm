@@ -37,9 +37,19 @@ data Exp
 data ScopedExp = ScopedExp Exp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
-data Type = TNat | TBool | TArrow Type Type
+data Type
+    = TUVar UVarIdent | TNat | TBool | TArrow Type Type | TVar Ident
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
+
+data ScopedType = ScopedType Type
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
+
+data TypePattern = TPatternVar Ident
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 newtype Ident = Ident String
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic, Data.String.IsString)
+
+newtype UVarIdent = UVarIdent String
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic, Data.String.IsString)
 
