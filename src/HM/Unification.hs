@@ -14,6 +14,7 @@ data ExtendedType
   | ETNat
   | ETArrow ExtendedType ExtendedType
   | ETVar Int
+  deriving (Show, Eq)
 
 data Constraint = Constraint ExtendedType ExtendedType
 
@@ -29,7 +30,16 @@ collectConstraints :: NameMap n ExtendedType -> Exp n -> [Constraint]
 collectConstraints = undefined -- TODO: implement
 
 unify :: [Constraint] -> Either String [Substitution]
-unify _constrs = undefined -- TODO: implement
+unify [] = return []
+unify (Constraint lhs rhs : constrs)
+  | lhs == rhs = unify constrs
+  | otherwise = case (lhs, rhs) of
+      (ETVar _, _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
+      (_, ETVar _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
+      _ -> Left ("unable to unify the types" <> show rhs <> show lhs)
 
-applySubstitutions :: ExtendedType -> [Substitution] -> ExtendedType
-applySubstitutions _typ _substs = undefined -- TODO: implement
+applyToConstraits :: [Substitution] -> Constraint -> Constraint
+applyToConstraits _subst (Constraint lhs rhs) = Constraint (applySubstitutions _subst lhs) (applySubstitutions _subst rhs)
+
+applySubstitutions :: [Substitution] -> ExtendedType -> ExtendedType
+applySubstitutions _substs _typ = undefined -- TODO: implement
