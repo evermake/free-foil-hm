@@ -11,8 +11,10 @@ import Control.Monad.Foil
   )
 import qualified Control.Monad.Foil as Foil
 import qualified Control.Monad.Free.Foil as FreeFoil
+import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Print as Raw
 import HM.Syntax
+import qualified Data.Foldable as F
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -91,3 +93,42 @@ inferType scope (EFor e1 e2 x expr) = do
   _ <- typecheck scope e2 TNat
   let newScope = addNameBinder x TNat scope
   inferType newScope expr
+
+type Constraint = (Type', Type')
+type USubst = (Raw.UVarIdent, Type')
+
+unify1 :: Constraint -> Either String [USubst]
+unify1 c =
+  case c of
+    (TUVar x, r) -> return [(x, r)]
+    (l, TUVar x) -> return [(x, l)]
+    (FreeFoil.Var x, FreeFoil.Var y)
+      | x == y -> return []
+    (FreeFoil.Node l, FreeFoil.Node r) ->
+      case FreeFoil.zipMatch l r of
+        Nothing -> Left "cannot unify"
+        Just lr -> unify (F.toList lr)  -- ignores "scopes", only works with "terms"
+
+    -- zipMatch (TArrowSig x1 x2) (TArrowSig y1 y2)
+    --   = Just (TArrowSig (x1, y1) (x2, y2))
+
+    -- (TArrow x1 x2, TArrow y1 y2)
+    -- (TTuple types1, TTuple types2)
+    -- (TForAll x1 type1, TForAll x2 type2)
+    -- (TSum x1 x2, TSum y1 y2)
+
+
+    _ -> Left "cannot unify"
+
+unify :: [Constraint] -> Either String [USubst]
+unify [] = return []
+unify (c:cs) = do
+  subst  <- unify1 c
+  subst' <- unify (map (applySubstsToConstraint subst) cs)
+  return (map (applySubstsInSubsts subst') subst ++ subst')
+
+applySubstsToConstraint :: [USubst] -> Constraint -> Constraint
+applySubstsToConstraint = undefined
+
+applySubstsInSubsts :: [USubst] -> USubst -> USubst
+applySubstsInSubsts = undefined
