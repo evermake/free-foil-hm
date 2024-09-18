@@ -8,21 +8,23 @@ import qualified Control.Monad.Free.Foil as FreeFoil
 import HM.Parser.Abs (Type (..))
 import HM.Syntax
 
+newtype UVar = UVar Int
+
 -- | Represents HM types but also adds the `ETVar Int` constructor,
 -- which represents a type variable with an integer identifier.
 data ExtendedType
   = ETBool
   | ETNat
   | ETArrow ExtendedType ExtendedType
-  | ETVar Int
+  | ETVar UVar
   deriving (Show, Eq)
 
 data Constraint = Constraint ExtendedType ExtendedType
 
--- | Represents a substition from a `ETArrow` to `ExtendedType`.
+-- | Represents a substition from a `ETVar` to `ExtendedType`.
 -- TODO: how we restrict the first type parameter of the constructor to
--- the `ETArrow`?
-data Substitution = Substitution ExtendedType ExtendedType
+-- the `ETVar`?
+data Substitution = Substitution UVar ExtendedType
 
 reconstructTypeClosed :: Exp Foil.VoidS -> Either String (ExtendedType, [Constraint])
 reconstructTypeClosed expr = do
@@ -91,10 +93,45 @@ unify (Constraint lhs rhs : constrs)
   | otherwise = case (lhs, rhs) of
       (ETVar _, _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
       (_, ETVar _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
+      (ETArrow x1 x2, ETArrow y1 y2) -> do
+        subst1 <- unify x1 x2
+        let y1' = applyToConstraits subst1 y1
+            y2' = applyToConstraits subst1 y2
+        subst2 <- unify y1 y2
+        return (??? subst1 ++ subst2)
       _ -> Left ("unable to unify the types" <> show rhs <> show lhs)
+
+-- 1.  (T₁ → Bool) → Nat → Nat  =  (Bool → T₁) → T₂
+-- 2.  T₁ → Bool = Bool → T₁
+--     Nat → Nat = T₂
+-- 3.  T₁ = Bool
+--     Bool = T₁
+--     Nat → Nat = T₂
+-- 4. [ T₁ ↦ Bool ]
+--     Bool = Bool
+--     Nat → Nat = T₂
+-- 5. [ T₁ ↦ Bool ]
+--     Nat → Nat = T₂
+-- Result:
+--  T₁ ↦ Bool
+--  T₂ ↦ (Nat → Nat)
+
+-- 1. T₁ → T₂ = T₂ → Bool
+-- 2. T₁ = T₂
+--    T₂ = Bool
+-- 3. [ T₁ ↦ T₂ ]
+--    T₂ = Bool
+-- 4. [ T₁ ↦ T₂ ]
+--    [ T₂ ↦ Bool ]
+-- Result:
+--   T₁ ↦ Bool    -- we need to apply [ T₂ ↦ Bool ] to [ T₁ ↦ T₂ ]
+--   T₂ ↦ Bool
 
 applyToConstraits :: [Substitution] -> Constraint -> Constraint
 applyToConstraits _subst (Constraint lhs rhs) = Constraint (applySubstitutions _subst lhs) (applySubstitutions _subst rhs)
 
 applySubstitutions :: [Substitution] -> ExtendedType -> ExtendedType
 applySubstitutions _substs _typ = undefined -- TODO: implement
+
+mergeSubstitutions :: [Substitution] -> [Substitution] -> [Substitution]
+mergeSubstitutions
