@@ -37,6 +37,7 @@ library
       HM.Parser.Print
       HM.Syntax
       HM.Typecheck
+      HM.Unification
   other-modules:
       Paths_free_foil_hm
   hs-source-dirs:
