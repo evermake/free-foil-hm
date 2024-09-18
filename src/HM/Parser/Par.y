@@ -15,6 +15,8 @@ module HM.Parser.Par
   , pExp
   , pScopedExp
   , pType
+  , pScopedType
+  , pTypePattern
   ) where
 
 import Prelude
@@ -31,36 +33,39 @@ import HM.Parser.Lex
 %name pExp Exp
 %name pScopedExp ScopedExp
 %name pType Type
+%name pScopedType ScopedType
+%name pTypePattern TypePattern
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
 %token
-  '('      { PT _ (TS _ 1)  }
-  ')'      { PT _ (TS _ 2)  }
-  '+'      { PT _ (TS _ 3)  }
-  '-'      { PT _ (TS _ 4)  }
-  '->'     { PT _ (TS _ 5)  }
-  '.'      { PT _ (TS _ 6)  }
-  '..'     { PT _ (TS _ 7)  }
-  ':'      { PT _ (TS _ 8)  }
-  '='      { PT _ (TS _ 9)  }
-  'Bool'   { PT _ (TS _ 10) }
-  'Nat'    { PT _ (TS _ 11) }
-  '['      { PT _ (TS _ 12) }
-  ']'      { PT _ (TS _ 13) }
-  'do'     { PT _ (TS _ 14) }
-  'else'   { PT _ (TS _ 15) }
-  'false'  { PT _ (TS _ 16) }
-  'for'    { PT _ (TS _ 17) }
-  'if'     { PT _ (TS _ 18) }
-  'in'     { PT _ (TS _ 19) }
-  'iszero' { PT _ (TS _ 20) }
-  'let'    { PT _ (TS _ 21) }
-  'then'   { PT _ (TS _ 22) }
-  'true'   { PT _ (TS _ 23) }
-  'λ'      { PT _ (TS _ 24) }
-  L_Ident  { PT _ (TV $$)   }
-  L_integ  { PT _ (TI $$)   }
+  '('         { PT _ (TS _ 1)         }
+  ')'         { PT _ (TS _ 2)         }
+  '+'         { PT _ (TS _ 3)         }
+  '-'         { PT _ (TS _ 4)         }
+  '->'        { PT _ (TS _ 5)         }
+  '.'         { PT _ (TS _ 6)         }
+  '..'        { PT _ (TS _ 7)         }
+  ':'         { PT _ (TS _ 8)         }
+  '='         { PT _ (TS _ 9)         }
+  'Bool'      { PT _ (TS _ 10)        }
+  'Nat'       { PT _ (TS _ 11)        }
+  '['         { PT _ (TS _ 12)        }
+  ']'         { PT _ (TS _ 13)        }
+  'do'        { PT _ (TS _ 14)        }
+  'else'      { PT _ (TS _ 15)        }
+  'false'     { PT _ (TS _ 16)        }
+  'for'       { PT _ (TS _ 17)        }
+  'if'        { PT _ (TS _ 18)        }
+  'in'        { PT _ (TS _ 19)        }
+  'iszero'    { PT _ (TS _ 20)        }
+  'let'       { PT _ (TS _ 21)        }
+  'then'      { PT _ (TS _ 22)        }
+  'true'      { PT _ (TS _ 23)        }
+  'λ'         { PT _ (TS _ 24)        }
+  L_Ident     { PT _ (TV $$)          }
+  L_integ     { PT _ (TI $$)          }
+  L_UVarIdent { PT _ (T_UVarIdent $$) }
 
 %%
 
@@ -69,6 +74,9 @@ Ident  : L_Ident { HM.Parser.Abs.Ident $1 }
 
 Integer :: { Integer }
 Integer  : L_integ  { (read $1) :: Integer }
+
+UVarIdent :: { HM.Parser.Abs.UVarIdent }
+UVarIdent  : L_UVarIdent { HM.Parser.Abs.UVarIdent $1 }
 
 Pattern :: { HM.Parser.Abs.Pattern }
 Pattern : Ident { HM.Parser.Abs.PatternVar $1 }
@@ -105,9 +113,17 @@ ScopedExp : Exp1 { HM.Parser.Abs.ScopedExp $1 }
 
 Type :: { HM.Parser.Abs.Type }
 Type
-  : 'Nat' { HM.Parser.Abs.TNat }
+  : UVarIdent { HM.Parser.Abs.TUVar $1 }
+  | 'Nat' { HM.Parser.Abs.TNat }
   | 'Bool' { HM.Parser.Abs.TBool }
   | Type '->' Type { HM.Parser.Abs.TArrow $1 $3 }
+  | Ident { HM.Parser.Abs.TVar $1 }
+
+ScopedType :: { HM.Parser.Abs.ScopedType }
+ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
+
+TypePattern :: { HM.Parser.Abs.TypePattern }
+TypePattern : Ident { HM.Parser.Abs.TPatternVar $1 }
 
 {
 
