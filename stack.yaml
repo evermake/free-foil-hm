@@ -2,4 +2,5 @@ resolver: nightly-2024-08-02
 packages:
   - .
 extra-deps:
-  - free-foil-0.0.3@sha256:cc4440d3d6ad4234611120fdecb228b621e0cabf57c1e8b8fb35282aa6fe0cfb,3134
+  # - free-foil-0.0.3@sha256:cc4440d3d6ad4234611120fdecb228b621e0cabf57c1e8b8fb35282aa6fe0cfb,3134
+  - free-foil-0.1.0@sha256:c762b0f0373b08d0c67c73384573d3a8f652278bab0ab380cc9f7c9bd35f372f,3134
