@@ -14,6 +14,8 @@ ETyped.  Exp  ::= Exp1 ":" Type ;
 ELet.    Exp1 ::= "let" Pattern "=" Exp1 "in" ScopedExp ;
 EAbs.    Exp1 ::= "λ" Pattern ":" Type "." ScopedExp ;
 EApp.    Exp1 ::= Exp1 Exp2 ;
+ETAbs.   Exp1 ::= "Λ" TypePattern "." ScopedExp ;
+ETApp.   Exp1 ::= Exp1 "[" Type "]" ;
 EFor.    Exp1 ::= "for" Pattern "in" "[" Exp1 ".." Exp1 "]" "do" ScopedExp ;
 
 ScopedExp. ScopedExp ::= Exp1 ;
@@ -26,7 +28,7 @@ TNat.   Type ::= "Nat" ;
 TBool.  Type ::= "Bool" ;
 TArrow. Type ::= Type "->" Type ;
 TVar.   Type ::= Ident ;
--- TForAll. Type ::= "forall" TypePattern "." ScopedType ;
+TForAll. Type ::= "forall" TypePattern "." ScopedType ;
 
 ScopedType. ScopedType ::= Type ;
 

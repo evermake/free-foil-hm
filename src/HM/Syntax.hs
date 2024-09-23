@@ -40,7 +40,7 @@ deriveBitraversable ''ExpSig
 
 mkPatternSynonyms ''ExpSig
 
-{-# COMPLETE Var, ETrue, EFalse, ENat, EAdd, ESub, EIf, EIsZero, ETyped, ELet, EAbs, EApp, EFor #-}
+{-# COMPLETE Var, ETrue, EFalse, ENat, EAdd, ESub, EIf, EIsZero, ETyped, ELet, EAbs, EApp, EFor, ETAbs, ETApp #-}
 
 -- ** Conversion helpers
 
@@ -61,7 +61,7 @@ deriveBitraversable ''TypeSig
 
 mkPatternSynonyms ''TypeSig
 
-{-# COMPLETE Var, TUVar, TBool, TNat, TArrow #-}
+{-# COMPLETE Var, TUVar, TBool, TNat, TArrow, TForAll #-}
 
 -- ** Conversion helpers
 

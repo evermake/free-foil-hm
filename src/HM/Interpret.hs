@@ -21,7 +21,7 @@ interpret :: String -> Result
 interpret input =
   case toExpClosed <$> pExp tokens of
     Left err -> Failure ParsingError ("Parsing error: " ++ err)
-    Right e -> case inferType emptyNameMap e of
+    Right e -> case inferType emptyNameMap emptyScope e of
       Left err -> Failure TypecheckingError ("Typechecking error: " ++ err)
       Right _type -> case eval emptyScope e of
         Left err -> Failure EvaluationError ("Evaluation error: " ++ err)
