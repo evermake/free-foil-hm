@@ -91,13 +91,13 @@ unify [] = return []
 unify (Constraint lhs rhs : constrs)
   | lhs == rhs = unify constrs
   | otherwise = case (lhs, rhs) of
-      (ETVar _, _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
-      (_, ETVar _) -> unify (map (applyToConstraits [Substitution lhs rhs]) constrs)
+      (ETVar var, _) -> unify (map (applyToConstraint (Substitution var rhs)) constrs)
+      (_, ETVar var) -> unify (map (applyToConstraint (Substitution var lhs)) constrs)
       (ETArrow x1 x2, ETArrow y1 y2) -> do
-        subst1 <- unify x1 x2
-        let y1' = applyToConstraits subst1 y1
-            y2' = applyToConstraits subst1 y2
-        subst2 <- unify y1 y2
+        subst1 <- unify [Constraint x1 x2]
+        let y1' = applySubsToSide subst1 y1
+            y2' = applySubsToSide subst1 y2
+        subst2 <- unify [Constraint y1 y2]
         return (??? subst1 ++ subst2)
       _ -> Left ("unable to unify the types" <> show rhs <> show lhs)
 
@@ -127,11 +127,20 @@ unify (Constraint lhs rhs : constrs)
 --   T₁ ↦ Bool    -- we need to apply [ T₂ ↦ Bool ] to [ T₁ ↦ T₂ ]
 --   T₂ ↦ Bool
 
-applyToConstraits :: [Substitution] -> Constraint -> Constraint
-applyToConstraits _subst (Constraint lhs rhs) = Constraint (applySubstitutions _subst lhs) (applySubstitutions _subst rhs)
+applyToConstraint :: Substitution -> Constraint -> Constraint
+applyToConstraint _const (Constraint lhs rhs) = Constraint (applyToSide _const lhs) (applyToSide _const rhs)
 
-applySubstitutions :: [Substitution] -> ExtendedType -> ExtendedType
-applySubstitutions _substs _typ = undefined -- TODO: implement
+applyToSide :: Substitution -> ExtendedType -> ExtendedType
+applyToSide _ ETBool = ETBool
+applyToSide _ ETNat = ETNat
+applyToSide _subst (ETArrow x y) = ETArrow (applyToSide _subst x) (applyToSide _subst y)
+applyToSide (Substitution (UVar var1) val) (ETVar (UVar var2)) | var1 == var2 = val
+
+applySubsToConstraints :: [Substitution] -> Constraint -> Constraint
+applySubsToConstraints _subs _const = foldl (flip applyToConstraint) _const _subs
+
+applySubsToSide :: [Substitution] -> ExtendedType -> ExtendedType
+applySubsToSide _subs _const = foldl (flip applyToSide) _const _subs
 
 mergeSubstitutions :: [Substitution] -> [Substitution] -> [Substitution]
-mergeSubstitutions
+mergeSubstitutions substs1 substs2 = undefined

@@ -38,7 +38,6 @@ library
       HM.Syntax
       HM.Typecheck
       HM.Unification
-      HM.Unify
   other-modules:
       Paths_free_foil_hm
   hs-source-dirs:
