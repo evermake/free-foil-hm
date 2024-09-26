@@ -1,36 +1,36 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# OPTIONS_GHC -Wno-orphans -Wno-simplifiable-class-constraints #-}
+{-# LANGUAGE DataKinds        #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ViewPatterns     #-}
 
 module HM.Typecheck where
 
-import Control.Monad.Foil
-  ( NameMap,
-    addNameBinder,
-    emptyNameMap,
-    lookupName,
-  )
-import qualified Control.Monad.Foil as Foil
-import qualified Control.Monad.Free.Foil as FreeFoil
-import qualified Data.Foldable as F
-import qualified HM.Parser.Abs as Raw
-import qualified HM.Parser.Print as Raw
-import HM.Syntax
+import           Control.Monad.Foil          (NameMap, addNameBinder,
+                                              emptyNameMap, lookupName)
+import qualified Control.Monad.Foil          as Foil
+import qualified Control.Monad.Foil.Internal as Foil
+import qualified Control.Monad.Free.Foil     as FreeFoil
+import           Data.Bifunctor
+import qualified Data.Foldable               as F
+import qualified HM.Parser.Abs               as Raw
+import qualified HM.Parser.Print             as Raw
+import           HM.Syntax
 
 -- $setup
 -- TODO: fix doctests
--- -- >>> :set -XOverloadedStrings
--- -- >>> import HM.Parser.Abs (Type' (..))
+-- >>> :set -XOverloadedStrings
+-- >>> import HM.Parser.Abs (Type' (..))
 
 -- | Typechecks an expression and maybe returns an error.
 -- TODO: fix doctests
--- -- >>> typecheckClosed "2 - (1 + 1)" TNat
--- -- Right TNat
--- -- >>> typecheckClosed "2 - (1 + true)" TNat
--- -- Left "expected type\n  TNat\nbut got type\n  Bool\nwhen typechecking expession\n  true\n"
--- -- >>> typecheckClosed "2 - (1 + 1)" TBool
--- -- Left "expected type\n  TBool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
--- -- >>> typecheckClosed "let x = 1 in let y = 2 in x + (let x = 3 in x + y)" TNat
--- -- Right TNat
+-- >>> typecheckClosed "2 - (1 + 1)" TNat
+-- Right TNat
+-- >>> typecheckClosed "2 - (1 + true)" TNat
+-- Left "expected type\n  TNat\nbut got type\n  Bool\nwhen typechecking expession\n  true\n"
+-- >>> typecheckClosed "2 - (1 + 1)" TBool
+-- Left "expected type\n  TBool\nbut got type\n  Nat\nwhen typechecking expession\n  2 - (1 + 1)\n"
+-- >>> typecheckClosed "let x = 1 in let y = 2 in x + (let x = 3 in x + y)" TNat
+-- Right TNat
 typecheckClosed :: Exp Foil.VoidS -> Type' -> Either String Type'
 typecheckClosed = typecheck emptyNameMap
 
@@ -136,15 +136,26 @@ unify (c : cs) = do
 applySubstsToConstraint :: [USubst] -> Constraint -> Constraint
 applySubstsToConstraint substs (l, r) = (applySubstsToType substs l, applySubstsToType substs r)
 
-applySubstToType :: USubst -> Type' -> Type'
-applySubstToType _ (FreeFoil.Var x) = FreeFoil.Var x
-applySubstToType _ (TNat) = TNat
-applySubstToType _ (TBool) = TBool
--- TODO: how to generalize this using Type signature?
-applySubstToType subst (TArrow l r) = TArrow (applySubstToType subst l) (applySubstToType subst r)
+-- FIXME: should be in the library!
+instance Foil.ExtEndo Foil.VoidS
+
+applySubstToType :: Foil.DExt Foil.VoidS n => USubst -> Type n -> Type n
 applySubstToType (ident, typ) (TUVar x)
-  | ident == x = typ
-  | otherwise = TUVar x
+  | ident == x  = Foil.sink typ
+  | otherwise   = TUVar x
+applySubstToType _ (FreeFoil.Var x) = FreeFoil.Var x
+applySubstToType subst (FreeFoil.Node node)
+  = FreeFoil.Node (bimap goScoped (applySubstToType subst) node)
+  where
+    goScoped (FreeFoil.ScopedAST binder body) =
+      case (Foil.assertExt binder, Foil.assertDistinct binder) of
+        (Foil.Ext, Foil.Distinct) ->
+          FreeFoil.ScopedAST binder (applySubstToType subst body)
+
+-- applySubstToType _ (TNat) = TNat
+-- applySubstToType _ (TBool) = TBool
+-- -- TODO: how to generalize this using Type signature?
+-- applySubstToType subst (TArrow l r) = TArrow (applySubstToType subst l) (applySubstToType subst r)
 
 applySubstsToType :: [USubst] -> Type' -> Type'
 applySubstsToType [] typ = typ
