@@ -71,7 +71,7 @@ inferType scope typeScope (EIf eCond eThen eElse) = do
 inferType scope typeScope (EIsZero e) = do
   _ <- typecheck scope typeScope e TNat
   return TBool
-inferType scope typeScope (ETyped expr (toType typeScope Map.empty -> type_)) = do -- TODO: ???
+inferType scope typeScope (ETyped expr (toType typeScope Map.empty -> type_)) = do 
   typecheck scope typeScope expr type_
 inferType scope typeScope (ELet e1 x e2) = do
   -- Γ ⊢ let x = e1 in e2 : ?
@@ -95,12 +95,13 @@ inferType scope typeScope (EFor e1 e2 x expr) = do
   _ <- typecheck scope typeScope e2 TNat
   let newScope = addNameBinder x TNat scope
   inferType newScope typeScope expr
-inferType scope typeScope (ETAbs t e wat) = do 
+inferType scope typeScope (ETAbs t e wat) = do  -- TODO: figure out why ETAbs has a third parameter?
   let newTypeScope = extendScopePattern t typeScope 
-  TArrow TVar <$> inferType scope newTypeScope e
+  TArrow (TVar t) <$> inferType scope newTypeScope e
 inferType scope typeScope (ETApp e t) = do 
-  inferType scope typeScope (ETApp e t) = do
-  typeE <- inferType scope typeScope e
-  case typeE of
-    TArrow TVar types -> return types
-    _ -> Left ("expected type\n  TArrow TVar\nbut got type\n  " <> show typeE)
+  case e of 
+    TArrow (TVar typeVar) resType -> do 
+      let subst = addSubst identitySubst typeVar t 
+      inferType scope typeScope (substitute typeScope subst e) 
+    _ -> Left ("expected type\n TArrow (TVar t) _\n but got type\n " <> show e)
+
