@@ -1,6 +1,6 @@
 module HM.Interpret where
 
-import Control.Monad.Foil (emptyNameMap, emptyScope)
+import Control.Monad.Foil (emptyScope)
 import HM.Eval
 import HM.Parser.Par
 import HM.Syntax (toExpClosed)
@@ -21,7 +21,7 @@ interpret :: String -> Result
 interpret input =
   case toExpClosed <$> pExp tokens of
     Left err -> Failure ParsingError ("Parsing error: " ++ err)
-    Right e -> case inferType emptyNameMap e of
+    Right e -> case inferTypeNewClosed e of
       Left err -> Failure TypecheckingError ("Typechecking error: " ++ err)
       Right _type -> case eval emptyScope e of
         Left err -> Failure EvaluationError ("Evaluation error: " ++ err)

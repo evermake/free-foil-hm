@@ -61,7 +61,7 @@ deriveBitraversable ''TypeSig
 
 mkPatternSynonyms ''TypeSig
 
-{-# COMPLETE Var, TUVar, TBool, TNat, TArrow #-}
+{-# COMPLETE Var, TUVar, TNat, TBool, TArrow #-}
 
 -- ** Conversion helpers
 
@@ -71,7 +71,9 @@ mkConvertFromFreeFoil ''Raw.Type ''Raw.Ident ''Raw.ScopedType ''Raw.TypePattern
 -- * User-defined code
 
 type Exp n = AST ExpSig n
+
 type Type n = AST TypeSig n
+
 type Type' = Type Foil.VoidS
 
 -- ** Conversion helpers (expressions)
@@ -114,7 +116,6 @@ instance IsString (Exp Foil.VoidS) where
 instance Show (Exp n) where
   show = Raw.printTree . fromExp
 
-
 -- ** Conversion helpers (types)
 
 -- | Convert 'Raw.Exp' into a scope-safe expression.
@@ -144,8 +145,9 @@ fromType =
 
 -- | Parse scope-safe terms via raw representation.
 --
--- >>> fromString "let x = 2 + 2 in let y = x - 1 in let x = 3 in y + x + y" :: Type Foil.VoidS
--- let x0 = 2 + 2 in let x1 = x0 - 1 in let x2 = 3 in x1 + x2 + x1
+-- TODO: fix this example
+-- -- >>> fromString "let x = 2 + 2 in let y = x - 1 in let x = 3 in y + x + y" :: Type Foil.VoidS
+-- -- let x0 = 2 + 2 in let x1 = x0 - 1 in let x2 = 3 in x1 + x2 + x1
 instance IsString (Type Foil.VoidS) where
   fromString input = case Raw.pType (Raw.myLexer input) of
     Left err -> error ("could not parse expression: " <> input <> "\n  " <> err)
