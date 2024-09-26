@@ -99,4 +99,8 @@ inferType scope typeScope (ETAbs t e wat) = do
   let newTypeScope = extendScopePattern t typeScope 
   TArrow TVar <$> inferType scope newTypeScope e
 inferType scope typeScope (ETApp e t) = do 
-  return TNat
+  inferType scope typeScope (ETApp e t) = do
+  typeE <- inferType scope typeScope e
+  case typeE of
+    TArrow TVar types -> return types
+    _ -> Left ("expected type\n  TArrow TVar\nbut got type\n  " <> show typeE)
