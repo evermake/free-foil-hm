@@ -62,7 +62,7 @@ All other symbols are terminals.
   |  |  **|**  | ``let`` //Pattern// ``=`` //Exp1// ``in`` //ScopedExp//
   |  |  **|**  | ``λ`` //Pattern// ``:`` //Type// ``.`` //ScopedExp//
   |  |  **|**  | //Exp1// //Exp2//
-  |  |  **|**  | ``Λ`` //TypePattern// ``.`` //ScopedExp//
+  |  |  **|**  | ``Λ`` //Pattern// ``.`` //ScopedExp//
   |  |  **|**  | //Exp1// ``[`` //Type// ``]``
   |  |  **|**  | ``for`` //Pattern// ``in`` ``[`` //Exp1// ``..`` //Exp1// ``]`` ``do`` //ScopedExp//
   |  |  **|**  | //Exp2//
@@ -74,9 +74,8 @@ All other symbols are terminals.
   |  |  **|**  | ``Bool``
   |  |  **|**  | //Type// ``->`` //Type//
   |  |  **|**  | //Ident//
-  |  |  **|**  | ``forall`` //TypePattern// ``.`` //ScopedType//
+  |  |  **|**  | ``forall`` //Pattern// ``.`` //ScopedType//
   | //ScopedType// | -> | //Type//
-  | //TypePattern// | -> | //Ident//
 
 
 

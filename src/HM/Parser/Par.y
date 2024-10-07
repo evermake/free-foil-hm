@@ -16,7 +16,6 @@ module HM.Parser.Par
   , pScopedExp
   , pType
   , pScopedType
-  , pTypePattern
   ) where
 
 import Prelude
@@ -34,7 +33,6 @@ import HM.Parser.Lex
 %name pScopedExp ScopedExp
 %name pType Type
 %name pScopedType ScopedType
-%name pTypePattern TypePattern
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
@@ -104,7 +102,7 @@ Exp1
   | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
   | 'λ' Pattern ':' Type '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 $6 }
   | Exp1 Exp2 { HM.Parser.Abs.EApp $1 $2 }
-  | 'Λ' TypePattern '.' ScopedExp { HM.Parser.Abs.ETAbs $2 $4 }
+  | 'Λ' Pattern '.' ScopedExp { HM.Parser.Abs.ETAbs $2 $4 }
   | Exp1 '[' Type ']' { HM.Parser.Abs.ETApp $1 $3 }
   | 'for' Pattern 'in' '[' Exp1 '..' Exp1 ']' 'do' ScopedExp { HM.Parser.Abs.EFor $2 $5 $7 $10 }
   | Exp2 { $1 }
@@ -122,13 +120,10 @@ Type
   | 'Bool' { HM.Parser.Abs.TBool }
   | Type '->' Type { HM.Parser.Abs.TArrow $1 $3 }
   | Ident { HM.Parser.Abs.TVar $1 }
-  | 'forall' TypePattern '.' ScopedType { HM.Parser.Abs.TForAll $2 $4 }
+  | 'forall' Pattern '.' ScopedType { HM.Parser.Abs.TForAll $2 $4 }
 
 ScopedType :: { HM.Parser.Abs.ScopedType }
 ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
-
-TypePattern :: { HM.Parser.Abs.TypePattern }
-TypePattern : Ident { HM.Parser.Abs.TPatternVar $1 }
 
 {
 

@@ -31,7 +31,7 @@ data Exp
     | ELet Pattern Exp ScopedExp
     | EAbs Pattern Type ScopedExp
     | EApp Exp Exp
-    | ETAbs TypePattern ScopedExp
+    | ETAbs Pattern ScopedExp
     | ETApp Exp Type
     | EFor Pattern Exp Exp ScopedExp
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
@@ -45,13 +45,10 @@ data Type
     | TBool
     | TArrow Type Type
     | TVar Ident
-    | TForAll TypePattern ScopedType
+    | TForAll Pattern ScopedType
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data ScopedType = ScopedType Type
-  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
-
-data TypePattern = TPatternVar Ident
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 newtype Ident = Ident String

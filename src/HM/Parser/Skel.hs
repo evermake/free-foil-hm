@@ -41,7 +41,7 @@ transExp x = case x of
   HM.Parser.Abs.ELet pattern_ exp scopedexp -> failure x
   HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> failure x
   HM.Parser.Abs.EApp exp1 exp2 -> failure x
-  HM.Parser.Abs.ETAbs typepattern scopedexp -> failure x
+  HM.Parser.Abs.ETAbs pattern_ scopedexp -> failure x
   HM.Parser.Abs.ETApp exp type_ -> failure x
   HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> failure x
 
@@ -56,12 +56,8 @@ transType x = case x of
   HM.Parser.Abs.TBool -> failure x
   HM.Parser.Abs.TArrow type_1 type_2 -> failure x
   HM.Parser.Abs.TVar ident -> failure x
-  HM.Parser.Abs.TForAll typepattern scopedtype -> failure x
+  HM.Parser.Abs.TForAll pattern_ scopedtype -> failure x
 
 transScopedType :: HM.Parser.Abs.ScopedType -> Result
 transScopedType x = case x of
   HM.Parser.Abs.ScopedType type_ -> failure x
-
-transTypePattern :: HM.Parser.Abs.TypePattern -> Result
-transTypePattern x = case x of
-  HM.Parser.Abs.TPatternVar ident -> failure x
