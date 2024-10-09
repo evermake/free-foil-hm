@@ -95,12 +95,14 @@ inferType scope typeScope (EFor e1 e2 x expr) = do
   _ <- typecheck scope typeScope e2 TNat
   let newScope = addNameBinder x TNat scope
   inferType newScope typeScope expr
-inferType scope typeScope (ETAbs t e wat) = do  -- TODO: figure out why ETAbs has a third parameter?
-  let newTypeScope = extendScopePattern t typeScope 
-  TArrow (TVar t) <$> inferType scope newTypeScope e
+inferType scope typeScope (ETAbs t e) = do  -- TODO: figure out why ETAbs has a third parameter?
+  let newTypeScope = Foil.extendScopePattern t typeScope 
+  TArrow (Var t) <$> inferType scope newTypeScope e
 inferType scope typeScope (ETApp e t) = do 
-  case e of 
-    TArrow (TVar typeVar) resType -> do 
+  type1 <- inferType scope typeScope e
+  case type1 of 
+    TArrow type_ types -> do 
+      _ <- typecheck scope typeScope type_ TVar
       let subst = addSubst identitySubst typeVar t 
       inferType scope typeScope (substitute typeScope subst e) 
     _ -> Left ("expected type\n TArrow (TVar t) _\n but got type\n " <> show e)

@@ -18,7 +18,7 @@ import Data.String (IsString (..))
 import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Par as Raw
 import qualified HM.Parser.Print as Raw
-import HM.Syntax.Pattern
+import HM.Syntax.Pattern as Pattern
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -50,15 +50,15 @@ mkConvertFromFreeFoil ''Raw.Type ''Raw.Ident ''Raw.ScopedType ''Raw.Pattern
 
 -- * User-defined code
 
-type Type n = AST TypeSig n
+type Type n = AST FoilPattern TypeSig n
 type Type' = Type Foil.VoidS
 
 -- ** Conversion helpers (types)
 
 -- | Convert 'Raw.Exp' into a scope-safe expression.
 -- This is a special case of 'convertToAST'.
-toType :: (Foil.Distinct n) => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Type -> AST TypeSig n
-toType = convertToAST convertToTypeSig getTypePatternBinder getTypeFromScopedType
+toType :: (Foil.Distinct n) => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Type -> AST FoilPattern TypeSig n
+toType = convertToAST convertToTypeSig toFoilPattern getTypeFromScopedType
 
 -- | Convert 'Raw.Type' into a closed scope-safe expression.
 -- This is a special case of 'toType'.
@@ -76,7 +76,7 @@ fromType =
   convertFromAST
     convertFromTypeSig
     Raw.TVar
-    Raw.PatternVar
+    fromFoilPattern
     Raw.ScopedType
     (\n -> Raw.Ident ("x" ++ show n))
 

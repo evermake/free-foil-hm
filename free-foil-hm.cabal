@@ -37,8 +37,8 @@ library
       HM.Parser.Print
       HM.Syntax
       HM.Syntax.Exp
-      HM.Syntax.Type
       HM.Syntax.Pattern
+      HM.Syntax.Type
       HM.Typecheck
   other-modules:
       Paths_free_foil_hm

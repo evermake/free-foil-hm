@@ -50,14 +50,14 @@ mkConvertFromFreeFoil ''Raw.Exp ''Raw.Ident ''Raw.ScopedExp ''Raw.Pattern
 
 -- * User-defined code
 
-type Exp n = AST Raw.Pattern ExpSig n
+type Exp n = AST FoilPattern ExpSig n
 
 -- ** Conversion helpers (expressions)
 
 -- | Convert 'Raw.Exp' into a scope-safe expression.
 -- This is a special case of 'convertToAST'.
-toExp :: (Foil.Distinct n) => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Exp -> AST ExpSig n
-toExp = convertToAST convertToExpSig getPatternBinder getExpFromScopedExp
+toExp :: (Foil.Distinct n) => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Exp -> AST FoilPattern ExpSig n
+toExp = convertToAST convertToExpSig toFoilPattern getExpFromScopedExp
 
 -- | Convert 'Raw.Exp' into a closed scope-safe expression.
 -- This is a special case of 'toExp'.
@@ -75,7 +75,7 @@ fromExp =
   convertFromAST
     convertFromExpSig
     Raw.EVar
-    Raw.PatternVar
+    fromFoilPattern
     Raw.ScopedExp
     (\n -> Raw.Ident ("x" ++ show n))
 

@@ -22,3 +22,4 @@ mkFoilPattern ''Raw.Ident ''Raw.Pattern
 deriveCoSinkable ''Raw.Ident ''Raw.Pattern
 mkToFoilPattern ''Raw.Ident ''Raw.Pattern
 mkFromFoilPattern ''Raw.Ident ''Raw.Pattern
+deriveUnifiablePattern ''Raw.Ident ''Raw.Pattern
