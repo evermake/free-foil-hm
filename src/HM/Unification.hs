@@ -8,7 +8,7 @@ import qualified Control.Monad.Free.Foil as FreeFoil
 import HM.Parser.Abs (Type (..))
 import HM.Syntax
 
-newtype UVar = UVar Int
+newtype UVar = UVar Int deriving (Show, Eq)
 
 -- | Represents HM types but also adds the `ETVar Int` constructor,
 -- which represents a type variable with an integer identifier.
@@ -26,10 +26,11 @@ data Constraint = Constraint ExtendedType ExtendedType
 -- the `ETVar`?
 data Substitution = Substitution UVar ExtendedType
 
-reconstructTypeClosed :: Exp Foil.VoidS -> Either String (ExtendedType, [Constraint])
+reconstructTypeClosed :: Exp Foil.VoidS -> Either String (ExtendedType, [Substitution])
 reconstructTypeClosed expr = do
   (typ, constrs, _freshId) <- reconstructType [] 0 Foil.emptyNameMap expr
-  return (typ, constrs)
+  subst <- unify constrs
+  return (typ, subst)
 
 -- | Recursively "reconstructs" type of an expression.
 -- On success, returns the "reconstructed" type and collected constraints.
@@ -63,7 +64,7 @@ reconstructType constrs freshId scope (EAbs tBody x eBody) = do
 reconstructType constrs freshId scope (EApp eAbs eArg) = do
   (absTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eAbs
   (argTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 scope eArg
-  let resultTyp = ETVar freshId3
+  let resultTyp = ETVar (UVar freshId3)
   return (resultTyp, constrs3 ++ [Constraint absTyp (ETArrow argTyp resultTyp)], freshId3 + 1)
 reconstructType constrs freshId scope (ETyped e typ) = do
   (eTyp, constrs2, freshId2) <- reconstructType constrs freshId scope e
@@ -97,9 +98,9 @@ unify (Constraint lhs rhs : constrs)
         subst1 <- unify [Constraint x1 x2]
         let y1' = applySubsToSide subst1 y1
             y2' = applySubsToSide subst1 y2
-        subst2 <- unify [Constraint y1 y2]
-        return (??? subst1 ++ subst2)
-      _ -> Left ("unable to unify the types" <> show rhs <> show lhs)
+        subst2 <- unify [Constraint y1' y2']
+        return (map (applySubsToSub subst2) subst1 ++ subst1)
+      _ -> Left ("unable to unify the types " <> show rhs <> " and " <> show lhs)
 
 -- 1.  (T₁ → Bool) → Nat → Nat  =  (Bool → T₁) → T₂
 -- 2.  T₁ → Bool = Bool → T₁
@@ -135,6 +136,7 @@ applyToSide _ ETBool = ETBool
 applyToSide _ ETNat = ETNat
 applyToSide _subst (ETArrow x y) = ETArrow (applyToSide _subst x) (applyToSide _subst y)
 applyToSide (Substitution (UVar var1) val) (ETVar (UVar var2)) | var1 == var2 = val
+applyToSide _ typ = typ
 
 applySubsToConstraints :: [Substitution] -> Constraint -> Constraint
 applySubsToConstraints _subs _const = foldl (flip applyToConstraint) _const _subs
@@ -142,5 +144,5 @@ applySubsToConstraints _subs _const = foldl (flip applyToConstraint) _const _sub
 applySubsToSide :: [Substitution] -> ExtendedType -> ExtendedType
 applySubsToSide _subs _const = foldl (flip applyToSide) _const _subs
 
-mergeSubstitutions :: [Substitution] -> [Substitution] -> [Substitution]
-mergeSubstitutions substs1 substs2 = undefined
+applySubsToSub :: [Substitution] -> Substitution -> Substitution
+applySubsToSub substs (Substitution var val) = Substitution var (applySubsToSide substs val)
