@@ -18,7 +18,7 @@ import Data.String (IsString (..))
 import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Par as Raw
 import qualified HM.Parser.Print as Raw
-import HM.Syntax.Pattern
+import HM.Syntax.Pattern hiding (getPatternBinder)
 
 -- $setup
 -- >>> :set -XOverloadedStrings

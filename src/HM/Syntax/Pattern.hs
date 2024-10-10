@@ -14,6 +14,7 @@ module HM.Syntax.Pattern where
 
 import qualified HM.Parser.Abs as Raw
 import           Control.Monad.Foil.TH
+import           Control.Monad.Free.Foil.TH
 
 
 -- ** Scope-safe patterns
@@ -23,3 +24,5 @@ deriveCoSinkable ''Raw.Ident ''Raw.Pattern
 mkToFoilPattern ''Raw.Ident ''Raw.Pattern
 mkFromFoilPattern ''Raw.Ident ''Raw.Pattern
 deriveUnifiablePattern ''Raw.Ident ''Raw.Pattern
+
+mkGetPatternBinder ''Raw.Ident ''Raw.Pattern

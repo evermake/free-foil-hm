@@ -5,6 +5,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -ddump-to-file #-}
 
 module HM.Syntax.Type where
 
@@ -18,7 +19,7 @@ import Data.String (IsString (..))
 import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Par as Raw
 import qualified HM.Parser.Print as Raw
-import HM.Syntax.Pattern as Pattern
+import HM.Syntax.Pattern as Pattern hiding (getPatternBinder)
 
 -- $setup
 -- >>> :set -XOverloadedStrings

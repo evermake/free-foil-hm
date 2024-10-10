@@ -14,6 +14,7 @@ import Control.Monad.Foil
 import qualified Control.Monad.Foil as Foil
 import qualified Control.Monad.Free.Foil as FreeFoil
 import qualified HM.Parser.Print as Raw
+import qualified HM.Parser.Abs as Raw
 import HM.Syntax
 import qualified Data.Map as Map
 
@@ -76,11 +77,15 @@ inferType scope typeScope (ETyped expr (toType typeScope Map.empty -> type_)) = 
 inferType scope typeScope (ELet e1 x e2) = do
   -- Γ ⊢ let x = e1 in e2 : ?
   type1 <- inferType scope typeScope e1 -- Γ ⊢ e1 : type1
-  let newScope = addNameBinder x type1 scope -- Γ' = Γ, x : type1
-  inferType newScope typeScope e2 -- Γ' ⊢ e2 : ?
+  
+  case getPatternBinder (fromFoilPattern (\n -> Raw.Ident ("x" ++ show n)) x) of 
+    Just binder -> do  
+      let newScope = addNameBinder binder type1 scope -- Γ' = Γ, x : type1
+      inferType newScope typeScope e2 -- Γ' ⊢ e2 : ?
+    Nothing -> Left ("expected NameBinder but got " <> show x)
 inferType scope typeScope (EAbs (toType typeScope Map.empty -> type_) x e) = do
   -- Γ ⊢ λx : type_. e : ?
-  let newScope = addNameBinder x type_ scope -- Γ' = Γ, x : type_
+  let newScope = addNameBinder (getPatternBinder x) type_ scope -- Γ' = Γ, x : type_
   TArrow type_ <$> inferType newScope typeScope e
 inferType scope typeScope (EApp e1 e2) = do
   -- (Γ ⊢ e1) (Γ ⊢ e2) : ?
