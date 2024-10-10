@@ -61,7 +61,7 @@ deriveBitraversable ''TypeSig
 
 mkPatternSynonyms ''TypeSig
 
-{-# COMPLETE Var, TUVar, TNat, TBool, TArrow #-}
+{-# COMPLETE Var, TUVar, TNat, TBool, TArrow, TForAll #-}
 
 -- ** Conversion helpers
 

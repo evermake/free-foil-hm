@@ -170,6 +170,7 @@ reconstructType :: [Constraint] -> Int -> Foil.NameMap n Type' -> Exp n -> Eithe
 reconstructType constrs freshId _scope ETrue = Right (TBool, constrs, freshId)
 reconstructType constrs freshId _scope EFalse = Right (TBool, constrs, freshId)
 reconstructType constrs freshId _scope (ENat _) = Right (TNat, constrs, freshId)
+-- specialize foralls (instantiate with fresh meta-vars)
 reconstructType constrs freshId scope (FreeFoil.Var x) = Right (Foil.lookupName x scope, constrs, freshId)
 reconstructType constrs freshId scope (EAdd lhs rhs) = do
   (lhsTyp, constrs2, freshId2) <- reconstructType constrs freshId scope lhs
@@ -204,7 +205,8 @@ reconstructType constrs freshId scope (ETyped e typ_) = do
   return (typ, constrs2 ++ [(eTyp, typ)], freshId2)
 reconstructType constrs freshId scope (ELet eWhat x eExpr) = do
   (whatTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eWhat
-  let newScope = Foil.addNameBinder x whatTyp scope
+  -- generalize whatTyp
+  let newScope = Foil.addNameBinder x whatTyp scope -- add x with generalized whatTyp (forall)
   (exprTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 newScope eExpr
   return (exprTyp, constrs3, freshId3)
 reconstructType constrs freshId scope (EFor eFrom eTo x eBody) = do
