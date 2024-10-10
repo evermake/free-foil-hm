@@ -26,7 +26,7 @@ TNat.   Type ::= "Nat" ;
 TBool.  Type ::= "Bool" ;
 TArrow. Type ::= Type "->" Type ;
 TVar.   Type ::= Ident ;
--- TForAll. Type ::= "forall" TypePattern "." ScopedType ;
+TForAll. Type ::= "forall" TypePattern "." ScopedType ;
 
 ScopedType. ScopedType ::= Type ;
 

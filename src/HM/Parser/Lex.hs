@@ -1683,12 +1683,13 @@ resWords =
           (b ")" 2 (b "(" 1 N N) (b "+" 3 N N)) (b "." 6 (b "->" 5 N N) N))
        (b "Bool" 10
           (b "=" 9 (b ":" 8 N N) N) (b "[" 12 (b "Nat" 11 N N) N)))
-    (b "in" 19
-       (b "false" 16
-          (b "else" 15 (b "do" 14 N N) N) (b "if" 18 (b "for" 17 N N) N))
-       (b "then" 22
-          (b "let" 21 (b "iszero" 20 N N) N)
-          (b "\955" 24 (b "true" 23 N N) N)))
+    (b "in" 20
+       (b "for" 17
+          (b "else" 15 (b "do" 14 N N) (b "false" 16 N N))
+          (b "if" 19 (b "forall" 18 N N) N))
+       (b "then" 23
+          (b "let" 22 (b "iszero" 21 N N) N)
+          (b "\955" 25 (b "true" 24 N N) N)))
   where
   b s n = B bs (TS bs n)
     where
