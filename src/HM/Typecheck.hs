@@ -157,24 +157,12 @@ applySubstToType subst (FreeFoil.Node node) =
         (Foil.Ext, Foil.Distinct) ->
           FreeFoil.ScopedAST binder (applySubstToType subst body)
 
--- applySubstToType _ (TNat) = TNat
--- applySubstToType _ (TBool) = TBool
--- -- TODO: how to generalize this using Type signature?
--- applySubstToType subst (TArrow l r) = TArrow (applySubstToType subst l) (applySubstToType subst r)
-
 applySubstsToType :: [USubst] -> Type' -> Type'
 applySubstsToType [] typ = typ
 applySubstsToType (subst : rest) typ = applySubstsToType rest (applySubstToType subst typ)
 
 applySubstsInSubsts :: [USubst] -> USubst -> USubst
 applySubstsInSubsts substs (l, r) = (l, (applySubstsToType substs r))
-
----
-
-reconstructTypeClosed :: Exp Foil.VoidS -> Either String (Type', [Constraint])
-reconstructTypeClosed expr = do
-  (typ, constrs, _freshId) <- reconstructType [] 0 Foil.emptyNameMap expr
-  return (typ, constrs)
 
 -- | Recursively "reconstructs" type of an expression.
 -- On success, returns the "reconstructed" type and collected constraints.
