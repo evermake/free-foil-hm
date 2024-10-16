@@ -50,14 +50,86 @@ mkConvertFromFreeFoil ''Raw.Term ''Raw.Ident ''Raw.ScopedTerm ''Raw.Pattern
 
 -- * User-defined code
 
-type Term n = AST FoilPattern TermSig n
-type Term' = Term Foil.VoidS
+-- type Term n = AST FoilPattern TermSig n
+-- type Term' = Term Foil.VoidS
+
+data Term n where 
+  EVar 
+    :: NameBinder s n {- var -}
+    -> Term n
+  ETrue :: Term n 
+  EFalse :: Term n
+  ENat :: Term n 
+  EAdd :: Term n -> Term n -> Term n
+  ESub :: Term n -> Term n -> Term n
+
+  EIf
+    :: Term n {- condition -}
+    -> Term n {- if cond true -}
+    -> Term n {- if cond false -}
+    -> Term n
+
+  EIsZero :: Term n -> Term n 
+
+  ETyped 
+    :: Term n {- expression -}
+    -> Term n {- type -}
+    -> Term n 
+
+  ELet 
+    :: NameBinder n l {- var -}
+    -> Term n {- value -}
+    -> Term l {- body -}
+    -> Term n
+
+  EAbs 
+    :: NameBinder n l {- var -}
+    -> Term n {- type -}
+    -> Term l {- body -}
+    -> Term n 
+
+  ETAbs 
+    :: NameBinder n l {- type var -}
+    -> Term l {- body -}
+    -> Term n
+
+  ETApp 
+    :: Term n {- forall -}
+    -> Term n {- type -}
+    -> Term n
+
+  EFor 
+    :: NameBinder n l {- iterator -}
+    -> Term n {- value from -}
+    -> Term n {- value to -} 
+    -> Term l {- body -}
+    -> Term n
+
+  TUVar 
+    :: NameBinder s n 
+    -> Term n
+  TVar 
+    :: NameBinder s n 
+    -> Term n
+
+  TNat :: Term n 
+  TBool :: Term n 
+
+  TArrow 
+    :: NameBinder n l {- parameter -}
+    -> Term l {- body -}
+    -> Term n
+
+  TForAll 
+    :: NameBinder n l {- type parameter -}
+    -> Term l {- body -}
+    -> Term n
 
 -- ** Conversion helpers (terms)
 
 -- | Convert 'Raw.Term' into a scope-safe term.
 -- This is a special case of 'convertToAST'.
-toTerm :: (Foil.Distinct n) => Foil.Scope n -> Map Raw.Ident (Foil.Name n) -> Raw.Term -> AST FoilPattern TermSig n
+toTerm :: Map Raw.Ident (Foil.Name n) -> Raw.Term -> AST FoilPattern TermSig n
 toTerm = convertToAST convertToTermSig toFoilPattern getTermFromScopedTerm
 
 -- | Convert 'Raw.Term' into a closed scope-safe term.
@@ -92,3 +164,13 @@ instance IsString (Term Foil.VoidS) where
 -- | Pretty-print scope-safe terms via"λ" Ident ":" Type "." Term1 raw representation.
 instance Show (Term n) where
   show = Raw.printTree . fromTerm
+
+-- | Determine if given Term is a type or not 
+isType :: Term n -> Bool
+isType (TUVar _) = True 
+isType (TVar _) = True 
+isType (TNat) = True 
+isType (TBool) = True 
+isType (TArrow _ _) = True 
+isType (TFOrALl _ _) = True 
+isType _ = False
