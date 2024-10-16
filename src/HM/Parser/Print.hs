@@ -145,45 +145,29 @@ instance Print HM.Parser.Abs.Pattern where
   prt i = \case
     HM.Parser.Abs.PatternVar id_ -> prPrec i 0 (concatD [prt 0 id_])
 
-instance Print HM.Parser.Abs.Exp where
+instance Print HM.Parser.Abs.Term where
   prt i = \case
     HM.Parser.Abs.EVar id_ -> prPrec i 3 (concatD [prt 0 id_])
     HM.Parser.Abs.ETrue -> prPrec i 3 (concatD [doc (showString "true")])
     HM.Parser.Abs.EFalse -> prPrec i 3 (concatD [doc (showString "false")])
     HM.Parser.Abs.ENat n -> prPrec i 3 (concatD [prt 0 n])
-    HM.Parser.Abs.EAdd exp1 exp2 -> prPrec i 2 (concatD [prt 2 exp1, doc (showString "+"), prt 3 exp2])
-    HM.Parser.Abs.ESub exp1 exp2 -> prPrec i 2 (concatD [prt 2 exp1, doc (showString "-"), prt 3 exp2])
-    HM.Parser.Abs.EIf exp1 exp2 exp3 -> prPrec i 1 (concatD [doc (showString "if"), prt 1 exp1, doc (showString "then"), prt 1 exp2, doc (showString "else"), prt 1 exp3])
-    HM.Parser.Abs.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
-    HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
-    HM.Parser.Abs.ELet pattern_ exp scopedexp -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 exp, doc (showString "in"), prt 0 scopedexp])
-    HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 pattern_, doc (showString ":"), prt 0 type_, doc (showString "."), prt 0 scopedexp])
-    HM.Parser.Abs.EApp exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, prt 2 exp2])
-    HM.Parser.Abs.ETAbs pattern_ scopedexp -> prPrec i 1 (concatD [doc (showString "\923"), prt 0 pattern_, doc (showString "."), prt 0 scopedexp])
-    HM.Parser.Abs.ETApp exp type_ -> prPrec i 1 (concatD [prt 1 exp, doc (showString "["), prt 0 type_, doc (showString "]")])
-    HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> prPrec i 1 (concatD [doc (showString "for"), prt 0 pattern_, doc (showString "in"), doc (showString "["), prt 1 exp1, doc (showString ".."), prt 1 exp2, doc (showString "]"), doc (showString "do"), prt 0 scopedexp])
-
-instance Print HM.Parser.Abs.ScopedExp where
-  prt i = \case
-    HM.Parser.Abs.ScopedExp exp -> prPrec i 0 (concatD [prt 1 exp])
-
-instance Print HM.Parser.Abs.Type where
-  prt i = \case
+    HM.Parser.Abs.EAdd term1 term2 -> prPrec i 2 (concatD [prt 2 term1, doc (showString "+"), prt 3 term2])
+    HM.Parser.Abs.ESub term1 term2 -> prPrec i 2 (concatD [prt 2 term1, doc (showString "-"), prt 3 term2])
+    HM.Parser.Abs.EIf term1 term2 term3 -> prPrec i 1 (concatD [doc (showString "if"), prt 1 term1, doc (showString "then"), prt 1 term2, doc (showString "else"), prt 1 term3])
+    HM.Parser.Abs.EIsZero term -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 term, doc (showString ")")])
+    HM.Parser.Abs.ETyped term1 term2 -> prPrec i 0 (concatD [prt 1 term1, doc (showString ":"), prt 0 term2])
+    HM.Parser.Abs.ELet pattern_ term scopedterm -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 term, doc (showString "in"), prt 0 scopedterm])
+    HM.Parser.Abs.EAbs pattern_ term scopedterm -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 pattern_, doc (showString ":"), prt 0 term, doc (showString "."), prt 0 scopedterm])
+    HM.Parser.Abs.EApp term1 term2 -> prPrec i 1 (concatD [prt 1 term1, prt 2 term2])
+    HM.Parser.Abs.ETAbs pattern_ scopedterm -> prPrec i 1 (concatD [doc (showString "\923"), prt 0 pattern_, doc (showString "."), prt 0 scopedterm])
+    HM.Parser.Abs.ETApp term1 term2 -> prPrec i 1 (concatD [prt 1 term1, doc (showString "["), prt 0 term2, doc (showString "]")])
+    HM.Parser.Abs.EFor pattern_ term1 term2 scopedterm -> prPrec i 1 (concatD [doc (showString "for"), prt 0 pattern_, doc (showString "in"), doc (showString "["), prt 1 term1, doc (showString ".."), prt 1 term2, doc (showString "]"), doc (showString "do"), prt 0 scopedterm])
     HM.Parser.Abs.TUVar uvarident -> prPrec i 0 (concatD [prt 0 uvarident])
     HM.Parser.Abs.TNat -> prPrec i 0 (concatD [doc (showString "Nat")])
     HM.Parser.Abs.TBool -> prPrec i 0 (concatD [doc (showString "Bool")])
-    HM.Parser.Abs.TArrow type_1 type_2 -> prPrec i 0 (concatD [prt 0 type_1, doc (showString "->"), prt 0 type_2])
+    HM.Parser.Abs.TArrow term1 term2 -> prPrec i 0 (concatD [prt 0 term1, doc (showString "->"), prt 0 term2])
     HM.Parser.Abs.TVar id_ -> prPrec i 0 (concatD [prt 0 id_])
-    HM.Parser.Abs.TForAll pattern_ scopedtype -> prPrec i 0 (concatD [doc (showString "forall"), prt 0 pattern_, doc (showString "."), prt 0 scopedtype])
-
-instance Print HM.Parser.Abs.ScopedType where
-  prt i = \case
-    HM.Parser.Abs.ScopedType type_ -> prPrec i 0 (concatD [prt 0 type_])
-
-instance Print HM.Parser.Abs.Term where
-  prt i = \case
-    HM.Parser.Abs.TermExp exp -> prPrec i 0 (concatD [prt 0 exp])
-    HM.Parser.Abs.TermType type_ -> prPrec i 0 (concatD [prt 0 type_])
+    HM.Parser.Abs.TForAll pattern_ scopedterm -> prPrec i 0 (concatD [doc (showString "forall"), prt 0 pattern_, doc (showString "."), prt 0 scopedterm])
 
 instance Print HM.Parser.Abs.ScopedTerm where
   prt i = \case

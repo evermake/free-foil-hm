@@ -17,7 +17,7 @@ import qualified Data.Map as Map
 import Data.String (IsString (..))
 import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Par as Raw
--- import qualified HM.Parser.Print as Raw
+import qualified HM.Parser.Print as Raw
 import HM.Syntax.Pattern hiding (getPatternBinder)
 
 -- $setup
@@ -90,5 +90,5 @@ instance IsString (Term Foil.VoidS) where
     Right term -> toTermClosed term
 
 -- | Pretty-print scope-safe terms via"λ" Ident ":" Type "." Term1 raw representation.
--- instance Show (Term n) where
---   show = Raw.printTree . fromTerm
+instance Show (Term n) where
+  show = Raw.printTree . fromTerm

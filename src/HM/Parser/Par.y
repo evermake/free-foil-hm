@@ -9,13 +9,9 @@ module HM.Parser.Par
   ( happyError
   , myLexer
   , pPattern
-  , pExp3
-  , pExp2
-  , pExp1
-  , pExp
-  , pScopedExp
-  , pType
-  , pScopedType
+  , pTerm3
+  , pTerm2
+  , pTerm1
   , pTerm
   , pScopedTerm
   ) where
@@ -28,13 +24,9 @@ import HM.Parser.Lex
 }
 
 %name pPattern Pattern
-%name pExp3 Exp3
-%name pExp2 Exp2
-%name pExp1 Exp1
-%name pExp Exp
-%name pScopedExp ScopedExp
-%name pType Type
-%name pScopedType ScopedType
+%name pTerm3 Term3
+%name pTerm2 Term2
+%name pTerm1 Term1
 %name pTerm Term
 %name pScopedTerm ScopedTerm
 -- no lexer declaration
@@ -85,54 +77,42 @@ UVarIdent  : L_UVarIdent { HM.Parser.Abs.UVarIdent $1 }
 Pattern :: { HM.Parser.Abs.Pattern }
 Pattern : Ident { HM.Parser.Abs.PatternVar $1 }
 
-Exp3 :: { HM.Parser.Abs.Exp }
-Exp3
+Term3 :: { HM.Parser.Abs.Term }
+Term3
   : Ident { HM.Parser.Abs.EVar $1 }
   | 'true' { HM.Parser.Abs.ETrue }
   | 'false' { HM.Parser.Abs.EFalse }
   | Integer { HM.Parser.Abs.ENat $1 }
-  | '(' Exp ')' { $2 }
+  | '(' Term ')' { $2 }
 
-Exp2 :: { HM.Parser.Abs.Exp }
-Exp2
-  : Exp2 '+' Exp3 { HM.Parser.Abs.EAdd $1 $3 }
-  | Exp2 '-' Exp3 { HM.Parser.Abs.ESub $1 $3 }
-  | 'iszero' '(' Exp ')' { HM.Parser.Abs.EIsZero $3 }
-  | Exp3 { $1 }
+Term2 :: { HM.Parser.Abs.Term }
+Term2
+  : Term2 '+' Term3 { HM.Parser.Abs.EAdd $1 $3 }
+  | Term2 '-' Term3 { HM.Parser.Abs.ESub $1 $3 }
+  | 'iszero' '(' Term ')' { HM.Parser.Abs.EIsZero $3 }
+  | Term3 { $1 }
 
-Exp1 :: { HM.Parser.Abs.Exp }
-Exp1
-  : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
-  | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
-  | 'λ' Pattern ':' Type '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 $6 }
-  | Exp1 Exp2 { HM.Parser.Abs.EApp $1 $2 }
-  | 'Λ' Pattern '.' ScopedExp { HM.Parser.Abs.ETAbs $2 $4 }
-  | Exp1 '[' Type ']' { HM.Parser.Abs.ETApp $1 $3 }
-  | 'for' Pattern 'in' '[' Exp1 '..' Exp1 ']' 'do' ScopedExp { HM.Parser.Abs.EFor $2 $5 $7 $10 }
-  | Exp2 { $1 }
-
-Exp :: { HM.Parser.Abs.Exp }
-Exp : Exp1 ':' Type { HM.Parser.Abs.ETyped $1 $3 } | Exp1 { $1 }
-
-ScopedExp :: { HM.Parser.Abs.ScopedExp }
-ScopedExp : Exp1 { HM.Parser.Abs.ScopedExp $1 }
-
-Type :: { HM.Parser.Abs.Type }
-Type
-  : UVarIdent { HM.Parser.Abs.TUVar $1 }
-  | 'Nat' { HM.Parser.Abs.TNat }
-  | 'Bool' { HM.Parser.Abs.TBool }
-  | Type '->' Type { HM.Parser.Abs.TArrow $1 $3 }
-  | Ident { HM.Parser.Abs.TVar $1 }
-  | 'forall' Pattern '.' ScopedType { HM.Parser.Abs.TForAll $2 $4 }
-
-ScopedType :: { HM.Parser.Abs.ScopedType }
-ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
+Term1 :: { HM.Parser.Abs.Term }
+Term1
+  : 'if' Term1 'then' Term1 'else' Term1 { HM.Parser.Abs.EIf $2 $4 $6 }
+  | 'let' Pattern '=' Term1 'in' ScopedTerm { HM.Parser.Abs.ELet $2 $4 $6 }
+  | 'λ' Pattern ':' Term '.' ScopedTerm { HM.Parser.Abs.EAbs $2 $4 $6 }
+  | Term1 Term2 { HM.Parser.Abs.EApp $1 $2 }
+  | 'Λ' Pattern '.' ScopedTerm { HM.Parser.Abs.ETAbs $2 $4 }
+  | Term1 '[' Term ']' { HM.Parser.Abs.ETApp $1 $3 }
+  | 'for' Pattern 'in' '[' Term1 '..' Term1 ']' 'do' ScopedTerm { HM.Parser.Abs.EFor $2 $5 $7 $10 }
+  | Term2 { $1 }
 
 Term :: { HM.Parser.Abs.Term }
 Term
-  : Exp { HM.Parser.Abs.TermExp $1 }
-  | Type { HM.Parser.Abs.TermType $1 }
+  : Term1 ':' Term { HM.Parser.Abs.ETyped $1 $3 }
+  | Term1 { $1 }
+  | UVarIdent { HM.Parser.Abs.TUVar $1 }
+  | 'Nat' { HM.Parser.Abs.TNat }
+  | 'Bool' { HM.Parser.Abs.TBool }
+  | Term '->' Term { HM.Parser.Abs.TArrow $1 $3 }
+  | Ident { HM.Parser.Abs.TVar $1 }
+  | 'forall' Pattern '.' ScopedTerm { HM.Parser.Abs.TForAll $2 $4 }
 
 ScopedTerm :: { HM.Parser.Abs.ScopedTerm }
 ScopedTerm : Term { HM.Parser.Abs.ScopedTerm $1 }

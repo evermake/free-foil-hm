@@ -27,45 +27,29 @@ transPattern :: HM.Parser.Abs.Pattern -> Result
 transPattern x = case x of
   HM.Parser.Abs.PatternVar ident -> failure x
 
-transExp :: HM.Parser.Abs.Exp -> Result
-transExp x = case x of
+transTerm :: HM.Parser.Abs.Term -> Result
+transTerm x = case x of
   HM.Parser.Abs.EVar ident -> failure x
   HM.Parser.Abs.ETrue -> failure x
   HM.Parser.Abs.EFalse -> failure x
   HM.Parser.Abs.ENat integer -> failure x
-  HM.Parser.Abs.EAdd exp1 exp2 -> failure x
-  HM.Parser.Abs.ESub exp1 exp2 -> failure x
-  HM.Parser.Abs.EIf exp1 exp2 exp3 -> failure x
-  HM.Parser.Abs.EIsZero exp -> failure x
-  HM.Parser.Abs.ETyped exp type_ -> failure x
-  HM.Parser.Abs.ELet pattern_ exp scopedexp -> failure x
-  HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> failure x
-  HM.Parser.Abs.EApp exp1 exp2 -> failure x
-  HM.Parser.Abs.ETAbs pattern_ scopedexp -> failure x
-  HM.Parser.Abs.ETApp exp type_ -> failure x
-  HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> failure x
-
-transScopedExp :: HM.Parser.Abs.ScopedExp -> Result
-transScopedExp x = case x of
-  HM.Parser.Abs.ScopedExp exp -> failure x
-
-transType :: HM.Parser.Abs.Type -> Result
-transType x = case x of
+  HM.Parser.Abs.EAdd term1 term2 -> failure x
+  HM.Parser.Abs.ESub term1 term2 -> failure x
+  HM.Parser.Abs.EIf term1 term2 term3 -> failure x
+  HM.Parser.Abs.EIsZero term -> failure x
+  HM.Parser.Abs.ETyped term1 term2 -> failure x
+  HM.Parser.Abs.ELet pattern_ term scopedterm -> failure x
+  HM.Parser.Abs.EAbs pattern_ term scopedterm -> failure x
+  HM.Parser.Abs.EApp term1 term2 -> failure x
+  HM.Parser.Abs.ETAbs pattern_ scopedterm -> failure x
+  HM.Parser.Abs.ETApp term1 term2 -> failure x
+  HM.Parser.Abs.EFor pattern_ term1 term2 scopedterm -> failure x
   HM.Parser.Abs.TUVar uvarident -> failure x
   HM.Parser.Abs.TNat -> failure x
   HM.Parser.Abs.TBool -> failure x
-  HM.Parser.Abs.TArrow type_1 type_2 -> failure x
+  HM.Parser.Abs.TArrow term1 term2 -> failure x
   HM.Parser.Abs.TVar ident -> failure x
-  HM.Parser.Abs.TForAll pattern_ scopedtype -> failure x
-
-transScopedType :: HM.Parser.Abs.ScopedType -> Result
-transScopedType x = case x of
-  HM.Parser.Abs.ScopedType type_ -> failure x
-
-transTerm :: HM.Parser.Abs.Term -> Result
-transTerm x = case x of
-  HM.Parser.Abs.TermExp exp -> failure x
-  HM.Parser.Abs.TermType type_ -> failure x
+  HM.Parser.Abs.TForAll pattern_ scopedterm -> failure x
 
 transScopedTerm :: HM.Parser.Abs.ScopedTerm -> Result
 transScopedTerm x = case x of
