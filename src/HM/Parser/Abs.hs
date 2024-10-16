@@ -51,7 +51,7 @@ data Type
 data ScopedType = ScopedType Type
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
-data Term = TermExp1 Exp | TermType Type
+data Term = TermExp Exp | TermType Type
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
 data ScopedTerm = ScopedTerm Term

@@ -34,6 +34,6 @@ ScopedType. ScopedType ::= Type ;
 
 -- TPatternVar. TypePattern ::= Ident ;
 
-rules    Term ::= Exp1 | Type ;
+rules    Term ::= Exp | Type ;
 
 ScopedTerm. ScopedTerm ::= Term ;

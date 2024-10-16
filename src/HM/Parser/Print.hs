@@ -182,7 +182,7 @@ instance Print HM.Parser.Abs.ScopedType where
 
 instance Print HM.Parser.Abs.Term where
   prt i = \case
-    HM.Parser.Abs.TermExp1 exp -> prPrec i 0 (concatD [prt 1 exp])
+    HM.Parser.Abs.TermExp exp -> prPrec i 0 (concatD [prt 0 exp])
     HM.Parser.Abs.TermType type_ -> prPrec i 0 (concatD [prt 0 type_])
 
 instance Print HM.Parser.Abs.ScopedTerm where

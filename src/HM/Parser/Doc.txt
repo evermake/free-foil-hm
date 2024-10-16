@@ -76,7 +76,7 @@ All other symbols are terminals.
   |  |  **|**  | //Ident//
   |  |  **|**  | ``forall`` //Pattern// ``.`` //ScopedType//
   | //ScopedType// | -> | //Type//
-  | //Term// | -> | //Exp1//
+  | //Term// | -> | //Exp//
   |  |  **|**  | //Type//
   | //ScopedTerm// | -> | //Term//
 

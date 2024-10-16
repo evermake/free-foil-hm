@@ -131,7 +131,7 @@ ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
 
 Term :: { HM.Parser.Abs.Term }
 Term
-  : Exp1 { HM.Parser.Abs.TermExp1 $1 }
+  : Exp { HM.Parser.Abs.TermExp $1 }
   | Type { HM.Parser.Abs.TermType $1 }
 
 ScopedTerm :: { HM.Parser.Abs.ScopedTerm }

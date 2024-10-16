@@ -71,21 +71,14 @@ toTermClosed = toTerm Foil.emptyScope Map.empty
 -- 'Raw.VarIdent' names are generated based on the raw identifiers in the underlying foil representation.
 --
 -- This function does not recover location information for variables, patterns, or scoped terms.
--- fromTerm :: Term n -> Raw.Term
--- fromTerm (Raw.TermExp1 e) =
---   convertFromAST
---     convertFromTermSig
---     (\e -> Raw.TermExp1 e)
---     fromFoilPattern
---     Raw.Exp
---     (\n -> Raw.Ident ("x" ++ show n))
--- fromTerm (Raw.TermType t) =
---   convertFromAST
---     convertFromTermSig
---     (\t -> Raw.TermType t)
---     fromFoilPattern
---     Raw.Type
---     (\n -> Raw.Ident ("x" ++ show n))
+fromTerm :: Term n -> Raw.Term
+fromTerm =
+  convertFromAST
+    convertFromTermSig
+    (\_ -> error "location missing")
+    fromFoilPattern
+    Raw.ScopedTerm
+    (\_ -> error "location missing")
 
 -- | Parse scope-safe terms via raw representation.
 --

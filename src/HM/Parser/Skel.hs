@@ -64,7 +64,7 @@ transScopedType x = case x of
 
 transTerm :: HM.Parser.Abs.Term -> Result
 transTerm x = case x of
-  HM.Parser.Abs.TermExp1 exp -> failure x
+  HM.Parser.Abs.TermExp exp -> failure x
   HM.Parser.Abs.TermType type_ -> failure x
 
 transScopedTerm :: HM.Parser.Abs.ScopedTerm -> Result
