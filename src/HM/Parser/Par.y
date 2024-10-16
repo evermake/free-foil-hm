@@ -16,6 +16,8 @@ module HM.Parser.Par
   , pScopedExp
   , pType
   , pScopedType
+  , pTerm
+  , pScopedTerm
   ) where
 
 import Prelude
@@ -33,6 +35,8 @@ import HM.Parser.Lex
 %name pScopedExp ScopedExp
 %name pType Type
 %name pScopedType ScopedType
+%name pTerm Term
+%name pScopedTerm ScopedTerm
 -- no lexer declaration
 %monad { Err } { (>>=) } { return }
 %tokentype {Token}
@@ -124,6 +128,14 @@ Type
 
 ScopedType :: { HM.Parser.Abs.ScopedType }
 ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
+
+Term :: { HM.Parser.Abs.Term }
+Term
+  : Exp1 { HM.Parser.Abs.TermExp1 $1 }
+  | Type { HM.Parser.Abs.TermType $1 }
+
+ScopedTerm :: { HM.Parser.Abs.ScopedTerm }
+ScopedTerm : Term { HM.Parser.Abs.ScopedTerm $1 }
 
 {
 

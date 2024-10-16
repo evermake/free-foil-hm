@@ -33,3 +33,7 @@ TForAll. Type ::= "forall" Pattern "." ScopedType ;
 ScopedType. ScopedType ::= Type ;
 
 -- TPatternVar. TypePattern ::= Ident ;
+
+rules    Term ::= Exp1 | Type ;
+
+ScopedTerm. ScopedTerm ::= Term ;

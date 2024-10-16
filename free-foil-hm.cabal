@@ -39,6 +39,7 @@ library
       HM.Syntax.Exp
       HM.Syntax.Pattern
       HM.Syntax.Type
+      HM.Syntax.Term
       HM.Typecheck
   other-modules:
       Paths_free_foil_hm

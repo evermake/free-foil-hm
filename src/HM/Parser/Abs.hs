@@ -51,6 +51,12 @@ data Type
 data ScopedType = ScopedType Type
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
 
+data Term = TermExp1 Exp | TermType Type
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
+
+data ScopedTerm = ScopedTerm Term
+  deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic)
+
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, C.Data, C.Typeable, C.Generic, Data.String.IsString)
 
