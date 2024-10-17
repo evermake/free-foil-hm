@@ -99,7 +99,8 @@ unify (Constraint lhs rhs : constrs)
         let y1' = applySubsToSide subst1 y1
             y2' = applySubsToSide subst1 y2
         subst2 <- unify [Constraint y1' y2']
-        return (map (applySubsToSub subst2) subst1 ++ subst1)
+        subst3 <- unify constrs
+        return (map (applySubsToSub (map (applySubsToSub subst2) subst1 ++ subst1)) subst3 ++ subst3)
       _ -> Left ("unable to unify the types " <> show rhs <> " and " <> show lhs)
 
 -- 1.  (T₁ → Bool) → Nat → Nat  =  (Bool → T₁) → T₂
