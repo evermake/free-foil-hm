@@ -101,7 +101,7 @@ Exp1 :: { HM.Parser.Abs.Exp }
 Exp1
   : 'if' Exp1 'then' Exp1 'else' Exp1 { HM.Parser.Abs.EIf $2 $4 $6 }
   | 'let' Pattern '=' Exp1 'in' ScopedExp { HM.Parser.Abs.ELet $2 $4 $6 }
-  | 'λ' Pattern ':' Type '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 $6 }
+  | 'λ' Pattern '.' ScopedExp { HM.Parser.Abs.EAbs $2 $4 }
   | Exp1 Exp2 { HM.Parser.Abs.EApp $1 $2 }
   | 'for' Pattern 'in' '[' Exp1 '..' Exp1 ']' 'do' ScopedExp { HM.Parser.Abs.EFor $2 $5 $7 $10 }
   | Exp2 { $1 }
@@ -119,7 +119,7 @@ Type
   | 'Bool' { HM.Parser.Abs.TBool }
   | Type '->' Type { HM.Parser.Abs.TArrow $1 $3 }
   | Ident { HM.Parser.Abs.TVar $1 }
-  | 'forall' TypePattern '.' ScopedType { HM.Parser.Abs.TForAll $2 $4 }
+  | 'forall' '[' TypePattern ']' '.' ScopedType { HM.Parser.Abs.TForAll $3 $6 }
 
 ScopedType :: { HM.Parser.Abs.ScopedType }
 ScopedType : Type { HM.Parser.Abs.ScopedType $1 }
