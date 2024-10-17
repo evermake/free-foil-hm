@@ -1,5 +1,8 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-orphans -Wno-simplifiable-class-constraints #-}
 
@@ -16,6 +19,10 @@ import qualified Control.Monad.Foil.Internal as Foil
 import qualified Control.Monad.Free.Foil as FreeFoil
 import Data.Bifunctor
 import qualified Data.Foldable as F
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import qualified Data.Void as FreeFoil
+import Foreign (free)
 import qualified HM.Parser.Abs as Raw
 import qualified HM.Parser.Print as Raw
 import HM.Syntax
@@ -89,7 +96,7 @@ inferType scope (ELet e1 x e2) = do
   type1 <- inferType scope e1 -- Γ ⊢ e1 : type1
   let newScope = addNameBinder x type1 scope -- Γ' = Γ, x : type1
   inferType newScope e2 -- Γ' ⊢ e2 : ?
-inferType scope (EAbs (toTypeClosed -> type_) x e) = do
+inferType scope (EAbs x e) = do
   -- Γ ⊢ λx : type_. e : ?
   let newScope = addNameBinder x type_ scope -- Γ' = Γ, x : type_
   TArrow type_ <$> inferType newScope e
@@ -171,7 +178,12 @@ reconstructType constrs freshId _scope ETrue = Right (TBool, constrs, freshId)
 reconstructType constrs freshId _scope EFalse = Right (TBool, constrs, freshId)
 reconstructType constrs freshId _scope (ENat _) = Right (TNat, constrs, freshId)
 -- specialize foralls (instantiate with fresh meta-vars)
-reconstructType constrs freshId scope (FreeFoil.Var x) = Right (Foil.lookupName x scope, constrs, freshId)
+reconstructType constrs freshId scope (FreeFoil.Var x) = do
+  let xTyp = Foil.lookupName x scope
+  let curXTyp = case xTyp of
+        TForAll _ _ -> instForAll xTyp freshId
+        _ -> xTyp
+  Right (curXTyp, constrs, freshId)
 reconstructType constrs freshId scope (EAdd lhs rhs) = do
   (lhsTyp, constrs2, freshId2) <- reconstructType constrs freshId scope lhs
   (rhsTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 scope rhs
@@ -188,12 +200,15 @@ reconstructType constrs freshId scope (EIf eCond eThen eElse) = do
 reconstructType constrs freshId scope (EIsZero e) = do
   (eTyp, constrs2, freshId2) <- reconstructType constrs freshId scope e
   return (TBool, constrs2 ++ [(eTyp, TNat)], freshId2)
-reconstructType constrs freshId scope (EAbs tBody_ x eBody) = do
+reconstructType constrs freshId scope (EAbs x eBody) = do
   -- TODO: Do not require typing by user, infert type instead.
   let tBody = toTypeClosed tBody_
   let newScope = Foil.addNameBinder x tBody scope
-  (bodyTyp, constrs2, freshId2) <- reconstructType constrs freshId newScope eBody
-  return (TArrow tBody bodyTyp, constrs2, freshId2)
+  (bodyTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eBody
+  -- let tX = case lookupInList constrs2 x of
+  --       Nothing -> TUVar x
+  --       Just typ -> typ
+  return (TArrow tBody_ bodyTyp, constrs2, freshId2)
 reconstructType constrs freshId scope (EApp eAbs eArg) = do
   (absTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eAbs
   (argTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 scope eArg
@@ -205,8 +220,8 @@ reconstructType constrs freshId scope (ETyped e typ_) = do
   return (typ, constrs2 ++ [(eTyp, typ)], freshId2)
 reconstructType constrs freshId scope (ELet eWhat x eExpr) = do
   (whatTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eWhat
-  -- generalize whatTyp
-  let newScope = Foil.addNameBinder x whatTyp scope -- add x with generalized whatTyp (forall)
+  let genWhatTyp = constructForAll whatTyp
+  let newScope = Foil.addNameBinder x genWhatTyp scope -- add x with generalized whatTyp (forall)
   (exprTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 newScope eExpr
   return (exprTyp, constrs3, freshId3)
 reconstructType constrs freshId scope (EFor eFrom eTo x eBody) = do
@@ -215,3 +230,27 @@ reconstructType constrs freshId scope (EFor eFrom eTo x eBody) = do
   let newScope = Foil.addNameBinder x TNat scope
   (bodyTyp, constrs4, freshId4) <- reconstructType constrs3 freshId3 newScope eBody
   return (bodyTyp, constrs4 ++ [(fromTyp, TNat), (toTyp, TNat)], freshId4)
+
+lookupInList :: [Constraint] -> Type' -> Maybe Type'
+lookupInList [] _ = Nothing
+lookupInList ((lhs, rhs) : _) var | var == lhs = Just rhs
+lookupInList (_ : xs) var = lookupInList xs var
+
+-- constructForAll :: Type' -> Type'
+constructForAll :: FreeFoil.AST TypeSig l0 -> FreeFoil.AST TypeSig l0
+constructForAll (TArrow (FreeFoil.Var arg) restExp) = TForAll arg (constructForAll restExp)
+constructForAll anyTyp = anyTyp
+
+-- instForAll :: Type' -> Int -> Type'
+instForAll :: (Show p, Num p) => FreeFoil.AST TypeSig n -> p -> FreeFoil.AST TypeSig n
+instForAll (TForAll arg restTyp) freshId = TArrow (TUVar (Raw.UVarIdent ("T" ++ show freshId))) (instForAll restTyp (freshId + 1))
+instForAll typ _ = typ
+
+-- instInType :: Type' -> NameBinder -> TUVar -> Type'
+instInType :: FreeFoil.AST TypeSig n -> Foil.Name n -> FreeFoil.AST TypeSig n -> FreeFoil.AST TypeSig n
+instInType (TForAll _ restTyp) oldPat newPat = instInType restTyp oldPat newPat
+instInType (TArrow lhs rhs) oldPat newPat = TArrow (instInType lhs oldPat newPat) (instInType rhs oldPat newPat)
+instInType (FreeFoil.Var x) oldPat newPat
+  | x == oldPat = newPat
+  | otherwise = x
+instInType typ _ _ = typ

@@ -19,10 +19,6 @@ transIdent :: HM.Parser.Abs.Ident -> Result
 transIdent x = case x of
   HM.Parser.Abs.Ident string -> failure x
 
-transUVarIdent :: HM.Parser.Abs.UVarIdent -> Result
-transUVarIdent x = case x of
-  HM.Parser.Abs.UVarIdent string -> failure x
-
 transPattern :: HM.Parser.Abs.Pattern -> Result
 transPattern x = case x of
   HM.Parser.Abs.PatternVar ident -> failure x
@@ -39,7 +35,7 @@ transExp x = case x of
   HM.Parser.Abs.EIsZero exp -> failure x
   HM.Parser.Abs.ETyped exp type_ -> failure x
   HM.Parser.Abs.ELet pattern_ exp scopedexp -> failure x
-  HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> failure x
+  HM.Parser.Abs.EAbs pattern_ scopedexp -> failure x
   HM.Parser.Abs.EApp exp1 exp2 -> failure x
   HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> failure x
 
@@ -49,7 +45,6 @@ transScopedExp x = case x of
 
 transType :: HM.Parser.Abs.Type -> Result
 transType x = case x of
-  HM.Parser.Abs.TUVar uvarident -> failure x
   HM.Parser.Abs.TNat -> failure x
   HM.Parser.Abs.TBool -> failure x
   HM.Parser.Abs.TArrow type_1 type_2 -> failure x

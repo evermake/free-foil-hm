@@ -1,5 +1,3 @@
-token UVarIdent ('?' letter (letter | digit | '_')*) ; ;
-
 PatternVar. Pattern ::= Ident ;
 
 EVar.    Exp3 ::= Ident ;
@@ -22,10 +20,9 @@ ScopedExp. ScopedExp ::= Exp1 ;
 -- https://bnfc.readthedocs.io/en/latest/lbnf.html#coercions
 coercions Exp 3 ;
 
-TUVar.   Type ::= UVarIdent ;
-TNat.    Type ::= "Nat" ;
-TBool.   Type ::= "Bool" ;
-TArrow.  Type ::= Type "->" Type ;
+TNat.  Type ::= "Nat" ;
+TBool. Type ::= "Bool" ;
+TArrow. Type ::= Type "->" Type ;
 TVar.    Type ::= Ident ;
 TForAll. Type ::= "forall" TypePattern "." ScopedType ;
 

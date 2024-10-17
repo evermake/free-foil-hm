@@ -39,10 +39,6 @@ $white+ ;
 @rsyms
     { tok (eitherResIdent TV) }
 
--- token UVarIdent
-\? $l (\_ | ($d | $l)) *
-    { tok (eitherResIdent T_UVarIdent) }
-
 -- Keywords and Ident
 $l $i*
     { tok (eitherResIdent TV) }
@@ -64,7 +60,6 @@ data Tok
   | TV !String                    -- ^ Identifier.
   | TD !String                    -- ^ Float literal.
   | TC !String                    -- ^ Character literal.
-  | T_UVarIdent !String
   deriving (Eq, Show, Ord)
 
 -- | Smart constructor for 'Tok' for the sake of backwards compatibility.
@@ -127,7 +122,6 @@ tokenText t = case t of
   PT _ (TD s)   -> s
   PT _ (TC s)   -> s
   Err _         -> "#error"
-  PT _ (T_UVarIdent s) -> s
 
 -- | Convert a token to a string.
 prToken :: Token -> String
