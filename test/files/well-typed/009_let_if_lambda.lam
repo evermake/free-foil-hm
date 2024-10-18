@@ -1,1 +1,1 @@
-let f = if iszero (5) then (λx:Nat. x) else (λx:Nat. x + 1) in f 5
+let f = if iszero (5) then (λx. x) else (λx. x + 1) in f 5

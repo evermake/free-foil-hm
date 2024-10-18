@@ -157,7 +157,7 @@ instance Print HM.Parser.Abs.Exp where
     HM.Parser.Abs.EIsZero exp -> prPrec i 2 (concatD [doc (showString "iszero"), doc (showString "("), prt 0 exp, doc (showString ")")])
     HM.Parser.Abs.ETyped exp type_ -> prPrec i 0 (concatD [prt 1 exp, doc (showString ":"), prt 0 type_])
     HM.Parser.Abs.ELet pattern_ exp scopedexp -> prPrec i 1 (concatD [doc (showString "let"), prt 0 pattern_, doc (showString "="), prt 1 exp, doc (showString "in"), prt 0 scopedexp])
-    HM.Parser.Abs.EAbs pattern_ type_ scopedexp -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 pattern_, doc (showString ":"), prt 0 type_, doc (showString "."), prt 0 scopedexp])
+    HM.Parser.Abs.EAbs pattern_ scopedexp -> prPrec i 1 (concatD [doc (showString "\955"), prt 0 pattern_, doc (showString "."), prt 0 scopedexp])
     HM.Parser.Abs.EApp exp1 exp2 -> prPrec i 1 (concatD [prt 1 exp1, prt 2 exp2])
     HM.Parser.Abs.EFor pattern_ exp1 exp2 scopedexp -> prPrec i 1 (concatD [doc (showString "for"), prt 0 pattern_, doc (showString "in"), doc (showString "["), prt 1 exp1, doc (showString ".."), prt 1 exp2, doc (showString "]"), doc (showString "do"), prt 0 scopedexp])
 
@@ -172,7 +172,8 @@ instance Print HM.Parser.Abs.Type where
     HM.Parser.Abs.TBool -> prPrec i 0 (concatD [doc (showString "Bool")])
     HM.Parser.Abs.TArrow type_1 type_2 -> prPrec i 0 (concatD [prt 0 type_1, doc (showString "->"), prt 0 type_2])
     HM.Parser.Abs.TVar id_ -> prPrec i 0 (concatD [prt 0 id_])
-    HM.Parser.Abs.TForAll typepattern scopedtype -> prPrec i 0 (concatD [doc (showString "forall"), prt 0 typepattern, doc (showString "."), prt 0 scopedtype])
+    HM.Parser.Abs.TFake typepattern scopedtype -> prPrec i 0 (concatD [doc (showString "fake"), prt 0 typepattern, doc (showString "."), prt 0 scopedtype])
+    HM.Parser.Abs.TForAll uvarident type_ -> prPrec i 0 (concatD [doc (showString "forall"), prt 0 uvarident, doc (showString "."), prt 0 type_])
 
 instance Print HM.Parser.Abs.ScopedType where
   prt i = \case

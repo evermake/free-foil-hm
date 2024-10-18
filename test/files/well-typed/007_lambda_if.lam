@@ -1,1 +1,1 @@
-(λx:Nat. if iszero (x) then 0 else x + 1) 5
+(λx. if iszero (x) then 0 else x + 1) 5

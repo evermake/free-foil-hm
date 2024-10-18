@@ -54,12 +54,12 @@ eval scope (ELet e1 x e2) = do
   e1' <- eval scope e1
   let subst = addSubst identitySubst x e1'
   eval scope (substitute scope subst e2)
-eval _scope (EAbs type_ x e) = Right (EAbs type_ x e)
+eval _scope (EAbs x e) = Right (EAbs x e)
 eval scope (EApp e1 e2) = do
   e1' <- eval scope e1
   e2' <- eval scope e2
   case e1' of
-    EAbs _ x e -> do
+    EAbs x e -> do
       let subst = addSubst identitySubst x e2'
       eval scope (substitute scope subst e)
     _ -> Left "Unsupported expression in application"
