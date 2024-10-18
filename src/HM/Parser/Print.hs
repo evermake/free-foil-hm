@@ -139,6 +139,8 @@ instance Print Double where
 
 instance Print HM.Parser.Abs.Ident where
   prt _ (HM.Parser.Abs.Ident i) = doc $ showString i
+instance Print HM.Parser.Abs.UVarIdent where
+  prt _ (HM.Parser.Abs.UVarIdent i) = doc $ showString i
 instance Print HM.Parser.Abs.Pattern where
   prt i = \case
     HM.Parser.Abs.PatternVar id_ -> prPrec i 0 (concatD [prt 0 id_])
@@ -165,6 +167,7 @@ instance Print HM.Parser.Abs.ScopedExp where
 
 instance Print HM.Parser.Abs.Type where
   prt i = \case
+    HM.Parser.Abs.TUVar uvarident -> prPrec i 0 (concatD [prt 0 uvarident])
     HM.Parser.Abs.TNat -> prPrec i 0 (concatD [doc (showString "Nat")])
     HM.Parser.Abs.TBool -> prPrec i 0 (concatD [doc (showString "Bool")])
     HM.Parser.Abs.TArrow type_1 type_2 -> prPrec i 0 (concatD [prt 0 type_1, doc (showString "->"), prt 0 type_2])
