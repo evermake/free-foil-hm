@@ -91,6 +91,14 @@ reconstructType constrs freshId scope (FreeFoil.Var x) = do
   let xTyp = Foil.lookupName x scope
   let (specTyp, freshId2) = specialize [] xTyp freshId
   return (specTyp, constrs ++ constrs, freshId2)
+reconstructType constrs freshId scope (ELet eWhat x eExpr) = do
+  (whatTyp, constrs2, freshId2) <- inferTypeNew constrs freshId scope eWhat
+  -- Since fresh IDs are generated incrementally, we can deduce which variables
+  -- have been used in the `eWhat`.
+  let genTyp = wrapWithForAlls (unificationVarIdentsBetween freshId freshId2) whatTyp
+  let newScope = Foil.addNameBinder x genTyp scope
+  (exprTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 newScope eExpr
+  return (exprTyp, constrs3, freshId3)
 reconstructType constrs freshId scope (EAdd lhs rhs) = do
   (lhsTyp, constrs2, freshId2) <- reconstructType constrs freshId scope lhs
   (rhsTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 scope rhs
@@ -121,14 +129,6 @@ reconstructType constrs freshId scope (ETyped e typ_) = do
   let typ = toTypeClosed typ_
   (eTyp, constrs2, freshId2) <- reconstructType constrs freshId scope e
   return (typ, constrs2 ++ [(eTyp, typ)], freshId2)
-reconstructType constrs freshId scope (ELet eWhat x eExpr) = do
-  (whatTyp, constrs2, freshId2) <- inferTypeNew constrs freshId scope eWhat
-  -- Since fresh IDs are generated incrementally, we can deduce which variables
-  -- have been used in the `eWhat`.
-  let genTyp = wrapWithForAlls (unificationVarIdentsBetween freshId freshId2) whatTyp
-  let newScope = Foil.addNameBinder x genTyp scope
-  (exprTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 newScope eExpr
-  return (exprTyp, constrs3, freshId3)
 reconstructType constrs freshId scope (EFor eFrom eTo x eBody) = do
   (fromTyp, constrs2, freshId2) <- reconstructType constrs freshId scope eFrom
   (toTyp, constrs3, freshId3) <- reconstructType constrs2 freshId2 scope eTo
@@ -159,6 +159,7 @@ specialize idsMap (TUVar ident) freshId = (TUVar (lookupIdentId idsMap ident), f
     lookupIdentId [] target = target
     lookupIdentId ((substFrom, substTo) : rest) target =
       if ((identId target) == substFrom) then (makeIdent substTo) else (lookupIdentId rest target)
+-- TODO: use some Free Foil AST function to generalize this
 specialize idsMap (TArrow argTyp bodyTyp) freshId =
   let (newArgTyp, freshId2) = specialize idsMap argTyp freshId
    in let (newBodyTyp, freshId3) = specialize idsMap bodyTyp freshId2
